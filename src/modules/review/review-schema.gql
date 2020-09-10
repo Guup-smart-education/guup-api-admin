@@ -1,0 +1,38 @@
+## Enum
+enum CommentFor {
+	COURSE
+	POST
+}
+
+## Inputs
+input IPostReview {
+	post: String!
+	commentary: String
+	starts: Int!
+}
+
+## Types
+type GetReview {
+	reviews: [Review]
+	success: Success
+}
+
+type PostReview {
+	review: String
+	success: Success
+}
+
+## Union
+union UGetReview = GetReview | ErrorResponse
+union UPostReview = PostReview | ErrorResponse
+
+## Queries
+type Query {
+	getReviewByCourse(course: String!): UGetReview @auth
+	getReviewByOwner(course: String!, owner: String): UGetReview @auth
+}
+
+# Mutations
+type Mutation {
+	createReview(collection: CommentFor!, review: IPostReview!): UPostReview @auth
+}

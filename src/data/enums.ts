@@ -1,0 +1,38 @@
+export enum GuupLevels {
+	'JUNIOR' = 'JUNIOR',
+	'MIDDLE' = 'MIDDLE',
+	'ADVANCE' = 'ADVANCE',
+}
+
+export enum GuupTypeContent {
+	'VIDEO' = 'VIDEO',
+	'ARTICLE' = 'ARTICLE',
+}
+
+export enum TypesErrors {
+	'ERROR' = 'ERROR',
+	'UNKNOWN' = 'UNKNOWN',
+	'INVALID_ARGUMENT' = 'INVALID_ARGUMENT',
+	'NOT_FOUND' = 'NOT_FOUND',
+	'ALREADY_EXISTS' = 'ALREADY_EXISTS',
+	'PERMISSION_DENIED' = 'PERMISSION_DENIED',
+	'UNAUTHENTICATED' = 'UNAUTHENTICATED',
+	'INTERNAL' = 'INTERNAL',
+	'UNAVAILABLE' = 'UNAVAILABLE',
+}
+
+export enum TypesSuccess {
+	'SUCCESS' = 'SUCCESS',
+	'CREATED' = 'CREATED',
+	'DELETED' = 'DELETED',
+	'UPDATED' = 'UPDATED',
+}
+
+export enum GuupUserRole {
+	'MASTER' = 'MASTER',
+	'ADMIN' = 'ADMIN',
+	'CREATOR' = 'CREATOR',
+	'MODERATOR' = 'MODERATOR',
+	'COMMON' = 'COMMON',
+	'GUEST' = 'GUEST',
+}

@@ -1,0 +1,40 @@
+## Inputs
+input InputPost {
+	title: String!
+	description: String!
+	photoURL: String
+	linkURL: String
+}
+
+## Types
+type GetPosts {
+	allPost: [Post]
+	success: Success
+}
+
+type GetPost {
+	post: Post
+	success: Success
+}
+
+type CreatePost {
+	createPost: String
+	success: Success
+}
+
+## Unions
+union UGetAllPost = GetPosts | ErrorResponse
+union UGetPost = GetPost | ErrorResponse
+union UCreatePost = CreatePost | ErrorResponse
+
+## Queries
+type Query {
+	getAllPosts: UGetAllPost @auth
+	getPostsByOwner(owner: String): UGetAllPost @auth
+	getPostsById(id: String!): UGetPost @auth
+}
+
+## Mutations
+type Mutation {
+	createPost(post: InputPost!): UCreatePost @auth
+}

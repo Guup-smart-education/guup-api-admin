@@ -1,0 +1,37 @@
+## Enum
+enum CommentFor {
+	COURSE
+	POST
+}
+
+## Inputs
+input IPostComment {
+	post: String!
+	description: String!
+}
+
+## Types
+type GetComment {
+	comments: [Comments]
+	success: Success
+}
+
+type PostComment {
+	comment: String
+	success: Success
+}
+
+## Union
+union UGetComment = GetComment | ErrorResponse
+union UPostComment = PostComment | ErrorResponse
+
+## Queries
+type Query {
+	getCommentByCourse(course: String!): UGetComment @auth
+}
+
+# Mutations
+type Mutation {
+	createComment(collection: CommentFor!, comment: IPostComment!): UPostComment
+		@auth
+}

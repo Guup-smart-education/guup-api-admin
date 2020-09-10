@@ -1,0 +1,42 @@
+## Inputs
+input ICompany {
+	name: String!
+	domain: String!
+	indetifier: String!
+}
+
+## Types
+type GetCompanies {
+	companies: [Company]
+	success: Success
+}
+
+type GetCompany {
+	company: Company
+	success: Success
+}
+
+type PostCompany {
+	company: String
+	success: Success
+}
+
+## Unions
+union UGetCompanies = GetCompanies | ErrorResponse
+union UGetCompany = GetCompany | ErrorResponse
+union UCreateCompany = PostCompany | ErrorResponse
+
+## Queries
+type Query {
+	getAllCompanies: UGetCompanies @hasRole(userRoles: [MASTER, ADMIN]) @auth
+	getAllCompanyByID(id: String): UGetCompany
+		@hasRole(userRoles: [MASTER, ADMIN])
+		@auth
+}
+
+## Mutations
+type Mutation {
+	createCompany(company: ICompany!): UCreateCompany
+		@hasRole(userRoles: [MASTER, ADMIN])
+		@auth
+}

@@ -1,0 +1,47 @@
+## inputs
+input InputUser {
+	email: String!
+	password: String
+	phoneNumber: String!
+	displayName: String
+	role: EnumUserRole!
+}
+
+## Types
+type RequestAccess {
+	expireIn: Int
+	success: Success
+}
+
+type SigInSuccess {
+	access: JWT
+	user: UserProfile
+	success: Success
+}
+
+type SignUpSuccess {
+	access: JWT
+	user: UserProfile
+	success: Success
+}
+
+type MessageError {
+	error: Error
+}
+
+## Union
+union URequestAccess = RequestAccess | SigInSuccess | ErrorResponse
+union USignInResult = SigInSuccess | ErrorResponse
+union USignUp = SignUpSuccess | ErrorResponse
+
+## Query
+type Query {
+	authQuery(id: Int): User
+}
+
+## Mutation
+type Mutation {
+	authRequestAccess(email: String!): URequestAccess!
+	authSignIn(email: String!, tokenAccess: Int!): USignInResult!
+	authSignUp(user: InputUser): USignUp!
+}

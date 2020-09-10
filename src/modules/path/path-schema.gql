@@ -1,0 +1,38 @@
+## Inputs
+input InputPath {
+	title: String!
+	description: String!
+}
+
+## Types
+type GetPaths {
+	allPaths: [Path]
+	success: Success
+}
+
+type GetPath {
+	path: Path
+	success: Success
+}
+
+type CreatePath {
+	createPath: String
+	success: Success
+}
+
+## Unions
+union UGetAllPaths = GetPaths | ErrorResponse
+union UGetPath = GetPath | ErrorResponse
+union UCreatePath = CreatePath | ErrorResponse
+
+## Queries
+type Query {
+	getAllPaths: UGetAllPaths @auth
+	getPathsByOwner(owner: String): UGetAllPaths @auth
+	getPathById(id: String!): UGetPath @auth
+}
+
+## Mutations
+type Mutation {
+	createPath(path: InputPath!): UCreatePath @auth
+}

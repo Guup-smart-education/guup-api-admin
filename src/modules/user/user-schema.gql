@@ -1,0 +1,67 @@
+## Inputs
+input IProfile {
+	displayName: String
+	photoURL: String
+	profission: String
+	presentation: String
+	experience: String
+	bio: String
+}
+
+input ISkill {
+	skillName: String!
+	skillLevel: EnumLevels
+}
+
+input IAchievements {
+	achievement: String!
+	achievementDescription: String
+}
+
+input InputUserProfile {
+	password: String
+	phoneNumber: String
+	profile: IProfile
+	skills: [ISkill]
+	achievements: [IAchievements]
+}
+
+## Types
+type GetUser {
+	user: User
+	success: Success
+}
+
+type GetAllUsers {
+	allUsers: [User]
+	success: Success
+}
+
+type CreateUser {
+	createuser: User
+	success: Success
+}
+
+type UpdateProfile {
+	updateprofile: User
+	success: Success
+}
+
+## Union
+union UGetUser = GetUser | ErrorResponse
+union UGetAllUsers = GetAllUsers | ErrorResponse
+union UUpdateProfile = UpdateProfile | ErrorResponse
+union UCreateUser = CreateUser | ErrorResponse
+
+## Queries
+type Query {
+	getUser(uid: String): UGetUser @auth
+	getAuthUsers: UGetAllUsers @hasRole(userRoles: [MASTER, ADMIN]) @auth
+	getAllUsers: UGetAllUsers @hasRole(userRoles: [MASTER, ADMIN]) @auth
+}
+
+## Mutations
+type Mutation {
+	createUser(user: InputUser): UCreateUser
+	updateUserProfile(user: InputUserProfile): UUpdateProfile @auth
+}

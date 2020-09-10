@@ -1,0 +1,83 @@
+## Inputs
+
+input ICourseAchievements {
+	title: String
+	description: String
+}
+
+input ICoursePrerequisites {
+	title: String
+	description: String
+}
+
+input ICourseGains {
+	title: String
+	description: String
+}
+
+input ICourseRatingComments {
+	title: String
+	description: String
+	owner: String
+	ownerName: String
+	ownerRole: String
+}
+
+input ICourseUser {
+	displayName: String!
+	photoURL: String!
+	profission: String!
+}
+
+input ICourse {
+	path: String
+	title: String!
+	description: String!
+	photoURL: String
+	videoURL: String
+	area: EnumAreas!
+	typeContent: EnumContentType!
+	difficult: EnumLevels!
+}
+
+## Types
+type GetCourses {
+	courses: [Course]
+	success: Success
+}
+
+type UpdateCourse {
+	course: Course
+	success: Success
+}
+
+type CreateCourse {
+	createCourse: String
+	success: Success
+}
+
+type GetCourseDetail {
+	course: Course
+	success: Success
+}
+
+## Union
+
+union UUpdateCourse = UpdateCourse | ErrorResponse
+union UCreateCourse = CreateCourse | ErrorResponse
+union UGetCourses = GetCourses | ErrorResponse
+union UGetCourseDetail = GetCourseDetail | ErrorResponse
+
+## Queries
+type Query {
+	getCourses: UGetCourses @auth
+	getCoursesByUser(uid: String): UGetCourses @auth
+	getCoursesByPath(path: String): UGetCourses @auth
+	getCourseByID(id: String): UGetCourseDetail @auth
+}
+
+## Mutations
+type Mutation {
+	updateCourse(course: ICourse): UUpdateCourse @auth
+	createCourse(course: ICourse): UCreateCourse @auth
+}

@@ -1,0 +1,277 @@
+## Enums
+enum EnumLevels {
+	JUNIOR
+	MIDDLE
+	ADVANCE
+}
+
+enum EnumErrors {
+	EMPTY
+	ERROR
+	UNKNOWN
+	INVALID_ARGUMENT
+	NOT_FOUND
+	ALREADY_EXISTS
+	PERMISSION_DENIED
+	UNAUTHENTICATED
+	INTERNAL
+	UNAVAILABLE
+}
+
+enum EnumUserRole {
+	MASTER
+	ADMIN
+	CREATOR
+	MODERATOR
+	COMMON
+	GUEST
+}
+
+enum EnumPostType {
+	COMMON
+	LINK
+	VIDEO
+}
+
+enum EnumAreas {
+	TECHNOLOGY
+	FRONTEND
+	BACKEND
+	DEVOS
+	BUSSINES
+	MARKETING
+	DESIGN
+	UX
+	SOFT_SKILLS
+}
+
+enum EnumKindCourse {
+	FREE
+	PAYTOUSEF
+}
+
+enum EnumContentType {
+	VIDEO
+	ARTICLE
+	PROJECT
+}
+
+## Directives
+directive @auth on FIELD_DEFINITION | FIELD
+directive @hasRole(userRoles: [EnumUserRole!]) on FIELD_DEFINITION | FIELD
+
+## Common
+type Success {
+	type: String
+	message: String
+}
+
+type Error {
+	type: String
+	message: String
+}
+
+type ErrorResponse {
+	error: Error!
+}
+
+## Course Path
+
+type Path {
+	id: String
+	owner: String
+	title: String
+	description: String
+	views: Int
+	comments: Int
+	claps: Int
+	disabled: Boolean
+	dateCreation: String
+	owners: [UserProfile]
+	area: [String]
+}
+
+## Comments
+type Comments {
+	id: String
+	owner: String
+	description: String
+	ownerProfile: UserProfile
+}
+
+## Courses
+type CourseModuleContent {
+	id: String
+	title: String
+	description: String
+}
+
+type CourseModules {
+	id: String
+	title: String
+	description: String
+	progress: Int
+	numberProjects: Int
+	numberContent: Int
+	contentHours: Float
+	content: [CourseModuleContent]
+}
+
+type CourseProjects {
+	id: String
+	title: String
+	description: String
+	contentHours: Float
+}
+
+type CourseAchievements {
+	id: String
+	title: String
+	description: String
+}
+
+type CoursePrerequisites {
+	id: String
+	title: String
+	description: String
+}
+
+type CourseGains {
+	id: String
+	title: String
+	description: String
+}
+
+type CourseRatingComments {
+	id: String
+	title: String
+	description: String
+	owner: String
+	ownerName: String
+	ownerRole: String
+}
+
+type CourseUser {
+	uid: String
+	email: String
+	displayName: String
+	photoURL: String
+	role: EnumUserRole
+}
+
+type Course {
+	id: String
+	path: String
+	owner: String
+	title: String
+	description: String
+	photoURL: String
+	videoURL: String
+	area: String
+	typeContent: String
+	difficult: String
+	viewsCount: Float
+	clapsCount: Float
+	commentsCount: Float
+	comments: [Comments]
+	ownerProfile: UserProfile
+	# subtitle: String
+	# duration: Float
+	# ownerName: String
+	# ownerRole: String
+	# ratingValue: Float
+	# enrolledUsers: [CourseUser]
+	# ratingComments: [CourseRatingComments]
+	# modules: [CourseModules]
+	# projects: [CourseProjects]
+	# achievements: [CourseAchievements]
+	# prerequisites: [CoursePrerequisites]
+	# gains: [CourseGains]
+}
+
+## Users
+
+type User {
+	uid: String
+	email: String
+	password: String
+	emailVerified: Boolean
+	phoneNumber: String
+	disabled: Boolean
+	passwordHash: String
+	passwordSalt: String
+	tokensValidAfterTime: String
+	tenantId: String
+	role: EnumUserRole
+	profile: UserProfile
+	skills: [UserSkill]
+	achievements: [UserAchievement]
+}
+
+type UserProfile {
+	uid: String
+	displayName: String
+	photoURL: String
+	profission: String
+	presentation: String
+	experience: String
+}
+
+type UserSkill {
+	skillName: String
+	skillLevel: EnumLevels
+	skillArea: EnumAreas
+}
+
+type UserAchievement {
+	achievement: String
+	achievementDescription: String
+}
+
+type UserPublic {
+	uid: String
+	email: String
+	displayName: String
+	photoURL: String
+	role: EnumUserRole
+}
+
+## Post
+type Post {
+	id: String
+	owner: String
+	title: String
+	description: String
+	photoURL: String
+	linkURL: String
+	viewsCount: Float
+	commentsCount: Float
+	clapsCount: Float
+	comments: [Comments]
+	ownerProfile: UserProfile
+}
+
+## Review
+type Review {
+	id: String
+	course: String
+	owner: String
+	commentary: String
+	starts: Int
+	ownerProfile: UserProfile
+}
+
+## Company
+type Company {
+	id: String
+	name: String
+	domain: String
+	indetifier: String
+	members: Int
+}
+
+## Json web Token
+type JWT {
+	token: String
+	refreshToken: String
+}
