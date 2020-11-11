@@ -1,4 +1,5 @@
 import { AuthData } from './../../models/auth'
+import { EUserTypesNames } from './user-enum'
 import { User } from './../../entities/user'
 import {
 	GetUserResponse,
@@ -18,6 +19,34 @@ import {
 } from './user-service'
 
 const userResolver = {
+	UGetUser: {
+		__resolveType: (obj: GetUserResponse, contex: any, info: any) => {
+			if (obj.user) return EUserTypesNames.GetUser
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetAllUsers: {
+		__resolveType: (obj: GetAllUsersResponse, contex: any, info: any) => {
+			if (obj.allUsers) return EUserTypesNames.GetAllUsers
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UUpdateProfile: {
+		__resolveType: (obj: UpdateProfileResponse, contex: any, info: any) => {
+			if (obj.updateprofile) return EUserTypesNames.UpdateProfile
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UCreateUser: {
+		__resolveType: (obj: CreateUserResponse, contex: any, info: any) => {
+			if (obj.createuser) return EUserTypesNames.CreateUser
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
 	Query: {
 		getUser: async (
 			obj: any,

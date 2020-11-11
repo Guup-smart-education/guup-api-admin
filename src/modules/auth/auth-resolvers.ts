@@ -1,3 +1,4 @@
+import { ESiginTypesNames } from './auth-enum'
 import {
 	SigninResponse,
 	RequestAccessResponse,
@@ -16,6 +17,28 @@ import {
 } from './auth-service'
 
 const userResolver = {
+	URequestAccess: {
+		__resolveType: (obj: RequestAccessResponse, contex: any, info: any) => {
+			if (obj.access || obj.expireIn || obj.user)
+				return ESiginTypesNames.RequestAccess
+			if (obj.error) return ESiginTypesNames.ErrorResponse
+			return null
+		},
+	},
+	USignInResult: {
+		__resolveType: (obj: SigninResponse, contex: any, info: any) => {
+			if (obj.user) return ESiginTypesNames.SigInSuccess
+			if (obj.error) return ESiginTypesNames.ErrorResponse
+			return null
+		},
+	},
+	USignUp: {
+		__resolveType: (obj: SignupResponse, contex: any, info: any) => {
+			if (obj.user) return ESiginTypesNames.SignUpSuccess
+			if (obj.error) return ESiginTypesNames.ErrorResponse
+			return null
+		},
+	},
 	Mutation: {
 		authRequestAccess: async (
 			obj: any,

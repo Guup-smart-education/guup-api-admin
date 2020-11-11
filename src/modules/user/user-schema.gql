@@ -2,6 +2,7 @@
 input IProfile {
 	displayName: String
 	photoURL: String
+	thumbnailURL: String
 	profission: String
 	presentation: String
 	experience: String

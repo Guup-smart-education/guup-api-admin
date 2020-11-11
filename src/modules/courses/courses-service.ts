@@ -1,27 +1,55 @@
+import R from 'ramda'
 import {
 	// Gets
 	GetCoursesByUserResponse,
 	GetCoursesResponse,
 	GetCourseById,
+	GetCoursesByPath,
 	// Posts
 	PostCourseResponse,
 	PostUpdateCourseResponse,
+	UpdatePathCourses,
+	RemoveCourseResponse,
+	GetCoursesByOwner,
 } from './courses'
 import { Courses } from './../../entities/courses'
+import { Profile } from './../../entities/user'
+import { Path } from './../../entities/path'
+import { TypesErrors } from './../../data/enums'
 import { ErrorGenerator } from './../../utils/error-utils'
 import { db, collections } from './../../firebase/firebase'
-import { FirebaseError } from 'firebase-admin'
+import { FirebaseError, firestore } from 'firebase-admin'
+import { LIMIT_LIST } from '../../constants'
+import { response } from 'express'
 
 // Get
 
-export const serviceGetCourses = (): Promise<GetCoursesResponse> => {
+export const serviceGetCourses = async (
+	lastCourse: string
+): Promise<GetCoursesResponse> => {
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.medium)
+		: courseRef.orderBy('createdAt', 'desc').limit(LIMIT_LIST.medium)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
+		coursePageRef
 			.get()
 			.then((data) => {
 				let courses: Array<Courses> = []
 				data.forEach((doc) => {
-					const course = { id: doc.id, ...doc.data() }
+					const dataCourse: Courses = doc.data()
+					const course: Courses = {
+						id: doc.id,
+						...dataCourse,
+						createdAt: dataCourse.createdAt.toDate(),
+					}
 					courses.push(course)
 				})
 				resolve({
@@ -44,24 +72,38 @@ export const serviceGetCourses = (): Promise<GetCoursesResponse> => {
 	})
 }
 
-export const serviceGetCoursesByUser = (
-	uid: string
-): Promise<GetCoursesByUserResponse> => {
+export const serviceGetCoursesByUser = async (
+	uid: string,
+	lastCourse: string
+): Promise<GetCoursesByOwner> => {
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.where('owner', '==', uid)
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.medium)
+		: courseRef
+				.where('owner', '==', uid)
+				.orderBy('createdAt', 'desc')
+				.limit(LIMIT_LIST.medium)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
-			.where('owner', '==', uid)
+		coursePageRef
 			.get()
 			.then((data) => {
-				let courses: Array<Courses> = []
+				let coursesByOwner: Array<Courses> = []
 				data.forEach((doc) => {
 					const course = { id: doc.id, ...doc.data() }
-					courses.push(course)
+					coursesByOwner.push(course)
 					console.log(doc.id, `Doc`, course)
 				})
-				console.log(`All Courses by user`, courses)
 				resolve({
-					__typename: 'GetCourses',
-					courses,
+					__typename: 'GetCoursesByOwner',
+					coursesByOwner,
 					success: {
 						message: 'All courses by users',
 					},
@@ -79,22 +121,43 @@ export const serviceGetCoursesByUser = (
 	})
 }
 
-export const serviceGetCoursesByPath = (
-	path: string
-): Promise<GetCoursesResponse> => {
+export const serviceGetCoursesByPath = async (
+	path: string,
+	lastCourse?: string
+): Promise<GetCoursesByPath> => {
+	console.log('path: ', path)
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.where('path', '==', path)
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.tiny)
+		: courseRef
+				.where('path', '==', path)
+				.orderBy('createdAt', 'desc')
+				.limit(LIMIT_LIST.tiny)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
-			.where('path', '==', path)
+		coursePageRef
 			.get()
 			.then((data) => {
-				let courses: Array<Courses> = []
+				let coursesByPath: Array<Courses> = []
 				data.forEach((doc) => {
-					const course = { id: doc.id, ...doc.data() }
-					courses.push(course)
+					const data: Courses = doc.data()
+					const course = {
+						id: doc.id,
+						...data,
+						createdAt: data.createdAt && data.createdAt.toDate(),
+					}
+					coursesByPath.push(course)
 				})
 				resolve({
-					__typename: 'GetCourses',
-					courses,
+					__typename: 'GetCoursesByPath',
+					coursesByPath,
 					success: {
 						message: 'All courses by users',
 					},
@@ -149,6 +212,34 @@ export const serviceGetCourseDetailByUser = (
 
 // Post
 
+export const serviceRemoveCourse = (
+	course: string
+): Promise<RemoveCourseResponse> => {
+	return new Promise((resolve, reject) => {
+		db.collection(collections.courses)
+			.doc(course)
+			.delete()
+			.then(() => {
+				resolve({
+					__typename: 'RemoveCourse',
+					removeCourse: course,
+					success: {
+						message: 'Curso removido com sucesso',
+					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				reject(ErrorGenerator(code, message))
+			})
+	})
+}
+
 export const serviceUpdateCourse = (
 	course: Courses
 ): Promise<PostUpdateCourseResponse> => {
@@ -169,13 +260,13 @@ export const serviceUpdateCourse = (
 	})
 }
 
-export const serviceCreateCourse = (
+export const serviceCreateCourse = async (
 	course: Courses
 ): Promise<PostCourseResponse> => {
-	console.log('couserviceCreateCourse: Course', course)
+	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
 		db.collection(collections.courses)
-			.add({ ...course })
+			.add({ ...course, createdAt })
 			.then(({ id }) => {
 				console.info('Course data', id)
 				resolve({
@@ -183,6 +274,45 @@ export const serviceCreateCourse = (
 					createCourse: id,
 					success: {
 						message: 'Course added successfull',
+					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+	})
+}
+
+export const serviceUpdatePathOwners = async (
+	pathId: string,
+	owner: Profile
+): Promise<UpdatePathCourses> => {
+	const pathRef = db.collection(collections.paths).doc(pathId)
+	const data = await pathRef.get()
+	const path: Path | undefined = data ? data.data() : {}
+	if (!path) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.NOT_FOUND,
+				message: 'Coleccion of course its not founded',
+			},
+		}
+	}
+	const owners = R.union(path.owners || [], [owner])
+	console.log('path.contentCount: ', path.contentCount)
+	const contentCount = path.contentCount ? path.contentCount + 1 : 0
+	return new Promise((resolve, reject) => {
+		pathRef
+			.update({ owners, contentCount })
+			.then(() => {
+				resolve({
+					__typename: 'UpdatePathCourse',
+					success: {
+						message: 'Added participant to da collection',
 					},
 				})
 			})

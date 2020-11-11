@@ -1,12 +1,7 @@
-import { ECommentTypesNames } from './comment-enum'
+import { ECommentTypesNames, CollectionComment } from './comment-enum'
 import { success } from './../../models/success'
 import { error } from './../../models/error'
 import { Comment } from './../../entities/comment'
-
-enum CollectionComment {
-	'COURSE' = 'COURSE',
-	'POST' = 'POST',
-}
 
 interface TypeName {
 	__typename: keyof typeof ECommentTypesNames
@@ -19,12 +14,18 @@ export interface GetCommentList extends TypeName, success, error {
 
 // Posts
 export interface PostCreateComment extends TypeName, success, error {
-	comment?: string
+	comment: Comment | null
 }
 
 // Inputs
 export interface IGetCommentCourse {
 	course: string
+	lastComment?: string
+}
+
+export interface IGetCommentPost {
+	post: string
+	lastComment?: string
 }
 
 export interface IPostComment {

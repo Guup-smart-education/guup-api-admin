@@ -10,9 +10,12 @@ export interface Profile {
 	uid?: string
 	displayName?: string
 	photoURL?: string
+	thumbnailURL?: string
 	profission?: string
 	presentation?: string
+	bio?: string
 	experience?: string
+	role?: keyof typeof GuupUserRole
 }
 
 export interface Skill {

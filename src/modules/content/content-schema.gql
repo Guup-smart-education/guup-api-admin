@@ -1,0 +1,37 @@
+## Types
+type GetContents {
+	allContents: [Content]
+	success: Success
+}
+
+type CreateContent {
+	contentCreated: String
+	success: Success
+}
+
+## Inputs
+input IContent {
+	title: String!
+	description: String!
+	photoURL: String
+	videoURL: String
+	area: [String]
+	typeContent: EnumContentType
+}
+
+## Unions
+union UGetAllContents = GetContents | ErrorResponse
+union UCreateContent = CreateContent | ErrorResponse
+
+## Queries
+type Query {
+	getAllContent(lastContent: String): UGetAllContents @auth
+}
+
+## Mutations
+type Mutation {
+	createContent(
+		collection: CollectionType!
+		content: IContent!
+	): UCreateContent @auth
+}

@@ -1,3 +1,5 @@
+scalar Date
+
 ## Enums
 enum EnumLevels {
 	JUNIOR
@@ -56,6 +58,11 @@ enum EnumContentType {
 	PROJECT
 }
 
+enum CollectionType {
+	PATH
+	COURSE
+}
+
 ## Directives
 directive @auth on FIELD_DEFINITION | FIELD
 directive @hasRole(userRoles: [EnumUserRole!]) on FIELD_DEFINITION | FIELD
@@ -75,6 +82,31 @@ type ErrorResponse {
 	error: Error!
 }
 
+## Content
+type Content {
+	id: String
+	collection: CollectionType
+	path: String
+	owner: String
+	title: String
+	description: String
+	photoURL: String
+	videoURL: String
+	area: [String]
+	typeContent: EnumContentType
+	viewsCount: Float
+	clapsCount: Float
+	claps: [String]
+	commentsCount: Float
+	comments: [Comments]
+	ownerProfile: UserProfile
+	owners: [UserProfile]
+	access: String
+	status: String
+	contentCount: Int
+	createdAt: Date
+}
+
 ## Course Path
 
 type Path {
@@ -82,13 +114,19 @@ type Path {
 	owner: String
 	title: String
 	description: String
+	photoURL: String
 	views: Int
 	comments: Int
 	claps: Int
 	disabled: Boolean
 	dateCreation: String
+	ownerProfile: UserProfile
 	owners: [UserProfile]
 	area: [String]
+	access: String
+	status: String
+	contentCount: Int
+	createdAt: Date
 }
 
 ## Comments
@@ -97,6 +135,7 @@ type Comments {
 	owner: String
 	description: String
 	ownerProfile: UserProfile
+	createdAt: Date
 }
 
 ## Courses
@@ -172,21 +211,11 @@ type Course {
 	difficult: String
 	viewsCount: Float
 	clapsCount: Float
+	claps: [String]
 	commentsCount: Float
 	comments: [Comments]
 	ownerProfile: UserProfile
-	# subtitle: String
-	# duration: Float
-	# ownerName: String
-	# ownerRole: String
-	# ratingValue: Float
-	# enrolledUsers: [CourseUser]
-	# ratingComments: [CourseRatingComments]
-	# modules: [CourseModules]
-	# projects: [CourseProjects]
-	# achievements: [CourseAchievements]
-	# prerequisites: [CoursePrerequisites]
-	# gains: [CourseGains]
+	createdAt: Date
 }
 
 ## Users
@@ -212,9 +241,11 @@ type UserProfile {
 	uid: String
 	displayName: String
 	photoURL: String
+	thumbnailURL: String
 	profission: String
 	presentation: String
 	experience: String
+	bio: String
 }
 
 type UserSkill {
@@ -247,8 +278,10 @@ type Post {
 	viewsCount: Float
 	commentsCount: Float
 	clapsCount: Float
+	claps: [String]
 	comments: [Comments]
 	ownerProfile: UserProfile
+	createdAt: Date
 }
 
 ## Review

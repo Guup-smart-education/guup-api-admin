@@ -3,3 +3,8 @@ export enum ECommentTypesNames {
 	'PostComment' = 'PostComment',
 	'ErrorResponse' = 'ErrorResponse',
 }
+
+export enum CollectionComment {
+	'COURSE' = 'COURSE',
+	'POST' = 'POST',
+}

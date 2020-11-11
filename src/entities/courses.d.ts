@@ -49,7 +49,9 @@ export interface Courses extends CommonCourseData {
 	difficult?: string
 	viewsCount?: Number
 	clapsCount?: Number
+	claps?: [string]
 	commentsCount?: Number
 	comments?: [Comment]
 	ownerProfile?: Profile
+	createdAt?: any
 }

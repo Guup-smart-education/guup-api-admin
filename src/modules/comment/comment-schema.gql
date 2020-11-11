@@ -17,7 +17,7 @@ type GetComment {
 }
 
 type PostComment {
-	comment: String
+	comment: Comments
 	success: Success
 }
 
@@ -28,6 +28,7 @@ union UPostComment = PostComment | ErrorResponse
 ## Queries
 type Query {
 	getCommentByCourse(course: String!): UGetComment @auth
+	getCommentByPost(post: String!, lastComment: String): UGetComment @auth
 }
 
 # Mutations

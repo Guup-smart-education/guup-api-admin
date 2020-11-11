@@ -17,6 +17,14 @@ export interface AllCourses extends TypeName, success, error {
 	courses?: Array<Courses>
 }
 
+export interface GetCoursesByPath extends TypeName, success, error {
+	coursesByPath?: Array<Courses>
+}
+
+export interface GetCoursesByOwner extends TypeName, success, error {
+	coursesByOwner?: Array<Courses>
+}
+
 export interface GetCoursesResponse extends success, error, AllCourses {}
 
 export interface GetCoursesByUserResponse extends success, error, AllCourses {}
@@ -26,8 +34,18 @@ export interface GetCourseById extends TypeName, success, error {
 }
 
 // Posts
+export interface UpdatePathCourses extends TypeName, success, error {}
+
 export interface PostCourseResponse extends TypeName, success, error {
 	createCourse?: any
+}
+
+export interface UptCourseResponse extends TypeName, success, error {
+	updateCourse?: any
+}
+
+export interface RemoveCourseResponse extends TypeName, success, error {
+	removeCourse?: any
 }
 
 export interface PostCourseModuleResponse extends TypeName, success, error {
@@ -61,6 +79,7 @@ export interface InputOwner {
 
 export interface InputUser {
 	uid: string
+	lastCourse: string
 }
 
 export interface InputCourse {
@@ -73,6 +92,7 @@ export interface InputCourseId {
 
 export interface InputCoursePath {
 	path: string
+	lastCourse?: string
 }
 
 export interface InputCourseUser {

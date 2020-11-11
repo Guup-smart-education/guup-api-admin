@@ -46,6 +46,16 @@ type GetCourses {
 	success: Success
 }
 
+type GetCoursesByOwner {
+	coursesByOwner: [Course]
+	success: Success
+}
+
+type GetCoursesByPath {
+	coursesByPath: [Course]
+	success: Success
+}
+
 type UpdateCourse {
 	course: Course
 	success: Success
@@ -56,6 +66,11 @@ type CreateCourse {
 	success: Success
 }
 
+type RemoveCourse {
+	removeCourse: String
+	success: Success
+}
+
 type GetCourseDetail {
 	course: Course
 	success: Success
@@ -63,16 +78,19 @@ type GetCourseDetail {
 
 ## Union
 
+union URemoveCourse = RemoveCourse | ErrorResponse
 union UUpdateCourse = UpdateCourse | ErrorResponse
 union UCreateCourse = CreateCourse | ErrorResponse
 union UGetCourses = GetCourses | ErrorResponse
+union UGetCoursesByOwner = GetCoursesByOwner | ErrorResponse
+union UGetCoursesByPath = GetCoursesByPath | ErrorResponse
 union UGetCourseDetail = GetCourseDetail | ErrorResponse
 
 ## Queries
 type Query {
-	getCourses: UGetCourses @auth
-	getCoursesByUser(uid: String): UGetCourses @auth
-	getCoursesByPath(path: String): UGetCourses @auth
+	getCourses(lastCourse: String): UGetCourses @auth
+	getCoursesByUser(uid: String, lastCourse: String): UGetCoursesByOwner @auth
+	getCoursesByPath(path: String!, lastCourse: String): UGetCoursesByPath @auth
 	getCourseByID(id: String): UGetCourseDetail @auth
 }
 
@@ -80,4 +98,5 @@ type Query {
 type Mutation {
 	updateCourse(course: ICourse): UUpdateCourse @auth
 	createCourse(course: ICourse): UCreateCourse @auth
+	removeCourse(course: String): URemoveCourse @auth
 }

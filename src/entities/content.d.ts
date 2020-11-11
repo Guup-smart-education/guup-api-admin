@@ -1,19 +1,26 @@
-import { success } from './../models/success'
 import { Comment } from './comment'
 import { Profile } from './user'
 
-export interface Post extends success {
+export interface Content {
 	id?: string
+	collection?: string
+	path?: string
 	owner?: string
 	title?: string
 	description?: string
 	photoURL?: string
-	linkURL?: string
+	videoURL?: string
+	area?: [string]
+	typeContent?: string
 	viewsCount?: number
-	commentsCount?: number
 	clapsCount?: number
 	claps?: [string]
+	commentsCount?: number
 	comments?: [Comment]
 	ownerProfile?: Profile
+	owners?: [Profile]
+	access?: string
+	status?: string
+	contentCount?: number
 	createdAt?: any
 }
