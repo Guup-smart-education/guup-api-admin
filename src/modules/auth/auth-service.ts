@@ -150,16 +150,13 @@ export const serviceAuthSignin = async ({
 		}
 	}
 	// Building user data and token session
-	let user: Profile = {}
+	let user: User = {}
 	verifyUser.forEach((data) => {
 		const { profile, role }: User = data.data()
 		console.log('verify user profile: ', profile)
 		user = {
 			uid: data.id,
-			displayName: profile?.displayName,
-			photoURL: profile?.photoURL,
-			thumbnailURL: profile?.thumbnailURL,
-			profission: profile?.profission,
+			profile,
 			role,
 		}
 	})
@@ -209,9 +206,17 @@ export const serviceAuthSignup = async ({
 		}
 	}
 	// Inserting new user
-	await userRef.add(user)
+	const completeUser: User = {
+		email: user.email,
+		phoneNumber: user.phoneNumber,
+		role: user.role,
+		profile: {
+			displayName: user.displayName,
+		},
+	}
+	await userRef.add(completeUser)
 	const { token, refreshToken } = jwtGenerateToken({
-		user,
+		user: { ...completeUser },
 		roles: user.role || '',
 	})
 	return {
@@ -220,7 +225,7 @@ export const serviceAuthSignup = async ({
 			token,
 			refreshToken,
 		},
-		user,
+		user: { ...completeUser },
 		success: {
 			message: 'User created successfull',
 		},

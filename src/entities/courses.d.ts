@@ -1,5 +1,6 @@
 import { Comment } from './comment'
 import { Profile } from './user'
+
 // export interface CommonCourseData {
 // 	id?: string
 // 	title?: string
@@ -23,6 +24,11 @@ import { Profile } from './user'
 // export interface CoursePrerequisites extends CommonCourseData {}
 // export interface CourseGains extends CommonCourseData {}
 
+export interface MediaMetaData {
+	fileBucket: string
+	fileFullPath: string
+	fileContentType: string
+}
 export interface Courses extends CommonCourseData {
 	// subtitle?: string
 	// area?: string
@@ -44,6 +50,10 @@ export interface Courses extends CommonCourseData {
 	description?: string
 	photoURL?: string
 	videoURL?: string
+	thumbnailURL?: string
+	gifURL?: string
+	videoAssetId?: string
+	videoPlaybackID?: string
 	area?: string
 	typeContent?: string
 	difficult?: string
@@ -54,4 +64,6 @@ export interface Courses extends CommonCourseData {
 	comments?: [Comment]
 	ownerProfile?: Profile
 	createdAt?: any
+	state?: string
+	metadata?: MediaMetaData
 }

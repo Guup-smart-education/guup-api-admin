@@ -13,3 +13,9 @@ export enum CoursesTypesNames {
 	'UpdatePathCourse' = 'UpdatePathCourse',
 	'ErrorResponse' = 'ErrorResponse',
 }
+
+export enum MediaState {
+	'preparing' = 'preparing',
+	'ready' = 'ready',
+	'errored' = 'errored',
+}

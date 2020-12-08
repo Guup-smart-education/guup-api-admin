@@ -1,6 +1,6 @@
-import { Profile } from './../entities/user'
+import { User } from './../entities/user'
 
 export interface AuthData {
-	user: Profile
+	user: User
 	roles: string
 }

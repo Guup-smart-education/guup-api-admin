@@ -117,17 +117,21 @@ const postResolvers = {
 	Mutation: {
 		createCourse: async (
 			obj: any,
-			{ course }: InputCourse,
-			{ user: { uid, ...args } }: AuthData
+			{ course, metadata }: InputCourse,
+			{ user: { uid, profile } }: AuthData
 		): Promise<PostCourseResponse> => {
-			const response = await serviceCreateCourse({
-				...course,
-				owner: uid,
-				ownerProfile: { ...args },
-			})
-			if (response.__typename === 'CreateCourse' && course.path) {
-				await serviceUpdatePathOwners(course.path, { uid, ...args })
-			}
+			console.log('createCourse: ', profile)
+			const response = await serviceCreateCourse(
+				{
+					...course,
+					owner: uid,
+					ownerProfile: { ...profile },
+				},
+				metadata
+			)
+			// if (response.__typename === 'CreateCourse' && course.path) {
+			// 	await serviceUpdatePathOwners(course.path, { uid, ...args })
+			// }
 			return response
 		},
 		removeCourse: async (

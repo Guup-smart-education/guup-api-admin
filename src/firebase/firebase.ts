@@ -16,3 +16,4 @@ export const db = firebaseAdmin.firestore()
 export const functions = firebaseFuctions
 export const firebase = firebaseAdmin
 export const collections = DataCollection
+export const storage = firebase.storage()

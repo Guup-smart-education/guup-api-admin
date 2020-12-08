@@ -51,11 +51,11 @@ const reviewsResolvers = {
 		createComment: async (
 			obj: any,
 			{ collection, comment }: IPostComment,
-			{ user: { uid, ...args } }: AuthData
+			{ user: { uid, profile } }: AuthData
 		): Promise<PostCreateComment> => {
 			return await servicePostComment({
 				collection,
-				comment: { ...comment, owner: uid, ownerProfile: { ...args } },
+				comment: { ...comment, owner: uid, ownerProfile: { ...profile } },
 			})
 		},
 	},

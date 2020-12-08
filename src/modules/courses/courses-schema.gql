@@ -33,11 +33,15 @@ input ICourse {
 	path: String
 	title: String!
 	description: String!
-	photoURL: String
-	videoURL: String
 	area: EnumAreas!
 	typeContent: EnumContentType!
 	difficult: EnumLevels!
+}
+
+input IMetaData {
+	fileBucket: String!
+	fileFullPath: String!
+	fileContentType: String!
 }
 
 ## Types
@@ -97,6 +101,6 @@ type Query {
 ## Mutations
 type Mutation {
 	updateCourse(course: ICourse): UUpdateCourse @auth
-	createCourse(course: ICourse): UCreateCourse @auth
+	createCourse(course: ICourse!, metadata: IMetaData!): UCreateCourse @auth
 	removeCourse(course: String): URemoveCourse @auth
 }

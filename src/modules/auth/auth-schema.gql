@@ -20,7 +20,7 @@ type RequestAccess {
 
 type SigInSuccess {
 	access: JWT
-	user: UserProfile
+	user: User
 	success: Success
 }
 
@@ -31,12 +31,8 @@ type SuccessAccess {
 
 type SignUpSuccess {
 	access: JWT
-	user: UserProfile
+	user: User
 	success: Success
-}
-
-type MessageError {
-	error: Error
 }
 
 ## Union

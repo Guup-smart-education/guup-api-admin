@@ -2,6 +2,7 @@ import {
 	Courses,
 	CourseModules,
 	CourseModuleContent,
+	MediaMetaData,
 } from './../../entities/courses'
 import { User } from './../../entities/user'
 import { error } from './../../models/error'
@@ -84,6 +85,7 @@ export interface InputUser {
 
 export interface InputCourse {
 	course: Courses
+	metadata: MediaMetaData
 }
 
 export interface InputCourseId {

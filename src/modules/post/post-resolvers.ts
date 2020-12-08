@@ -86,11 +86,10 @@ const resolvers = {
 		createPost: async (
 			obj: any,
 			{ post }: ICreatePost,
-			{ user: { uid, ...args } }: AuthData
+			{ user: { uid, profile } }: AuthData
 		): Promise<PostCreatePost> => {
-			console.log('serviceCreatepost', args)
 			return await serviceCreatepost({
-				post: { ...post, owner: uid, ownerProfile: { ...args } },
+				post: { ...post, owner: uid, ownerProfile: { ...profile } },
 			})
 		},
 		clapPost: async (

@@ -1,6 +1,11 @@
 scalar Date
 
 ## Enums
+enum MediaState {
+	preparing
+	ready
+	errored
+}
 enum EnumLevels {
 	JUNIOR
 	MIDDLE
@@ -198,6 +203,12 @@ type CourseUser {
 	role: EnumUserRole
 }
 
+type MediaMetaData {
+	fileFullPath: String
+	fileBucket: String
+	fileContentType: String
+}
+
 type Course {
 	id: String
 	path: String
@@ -206,6 +217,10 @@ type Course {
 	description: String
 	photoURL: String
 	videoURL: String
+	thumbnailURL: String
+	gifURL: String
+	videoAssetId: String
+	videoPlaybackID: String
 	area: String
 	typeContent: String
 	difficult: String
@@ -216,6 +231,8 @@ type Course {
 	comments: [Comments]
 	ownerProfile: UserProfile
 	createdAt: Date
+	state: MediaState
+	metadata: MediaMetaData
 }
 
 ## Users

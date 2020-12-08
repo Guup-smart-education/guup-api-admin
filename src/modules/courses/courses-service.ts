@@ -1,4 +1,5 @@
 import R from 'ramda'
+import * as dotenv from 'dotenv'
 import {
 	// Gets
 	GetCoursesByUserResponse,
@@ -12,15 +13,17 @@ import {
 	RemoveCourseResponse,
 	GetCoursesByOwner,
 } from './courses'
-import { Courses } from './../../entities/courses'
+import { Courses, MediaMetaData } from './../../entities/courses'
 import { Profile } from './../../entities/user'
 import { Path } from './../../entities/path'
 import { TypesErrors } from './../../data/enums'
 import { ErrorGenerator } from './../../utils/error-utils'
-import { db, collections } from './../../firebase/firebase'
+import { db, collections, storage } from './../../firebase/firebase'
 import { FirebaseError, firestore } from 'firebase-admin'
 import { LIMIT_LIST } from '../../constants'
-import { response } from 'express'
+import { MuxCreateAsset, MuxGetPlaybackID } from '../../service/mux-service'
+
+dotenv.config()
 
 // Get
 
@@ -261,12 +264,45 @@ export const serviceUpdateCourse = (
 }
 
 export const serviceCreateCourse = async (
-	course: Courses
+	course: Courses,
+	metadata: MediaMetaData
 ): Promise<PostCourseResponse> => {
+	if (!metadata) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.ERROR,
+				message: 'Não foram proporcionadas informações insuficientes',
+			},
+		}
+	}
+	const [filePublic] = await storage
+		.bucket(metadata.fileBucket)
+		.file(`${metadata.fileFullPath}`)
+		.makePublic()
+	const videoURL: string = `${process.env.GCLOUD_STORAGE_ADDRESS}/${filePublic.bucket}/${filePublic.object}`
+	// Creating a Video Asset
+	const muxCreateAsset: any = await MuxCreateAsset(videoURL, 'public')
+	const videoAssetId = `${muxCreateAsset.id}`
+	// Creating a playback Id
+	const muxPlayBackId: any = await MuxGetPlaybackID(videoAssetId)
+	const videoPlaybackID = `${muxPlayBackId.id}`
+	console.log('playBackId: ', muxPlayBackId)
+	const thumbnailURL = `https://image.mux.com/${videoPlaybackID}/thumbnail.png?width=420`
+	const gifURL = `https://image.mux.com/${videoPlaybackID}/animated.gif?fps=30&width=420`
 	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
 		db.collection(collections.courses)
-			.add({ ...course, createdAt })
+			.add({
+				...course,
+				createdAt,
+				metadata,
+				videoURL,
+				videoAssetId,
+				videoPlaybackID,
+				thumbnailURL,
+				gifURL,
+			})
 			.then(({ id }) => {
 				console.info('Course data', id)
 				resolve({
@@ -328,7 +364,25 @@ export const serviceUpdatePathOwners = async (
 export const serviceGetCourseById = async (
 	course: string
 ): Promise<GetCourseById> => {
+	const ref = storage
+		.bucket('guup-36ad1.appspot.com')
+		.file(
+			'courses/49V0ly7JwjgcGk78WNEp/7c4b2b4c-b557-4a34-9609-6cedaf7638dd.mp4'
+		)
+	const [file] = await ref.makePublic()
+	console.log('file: ', file)
+
+	// .getSignedUrl({
+	// 	action: 'read',
+	// 	expires: Date.now() + 1000 * 60 * 10,
+	// 	version: 'v4',
+	// })
+	// .then((res) => {
+	// 	console.log('makePublic: ', res)
+	// })
+	// .catch((e) => console.log('makePublic error: ', e))
 	return new Promise((resolve, reject) => {
+		console.log('course by id')
 		db.collection(collections.courses)
 			.doc(course)
 			.get()
