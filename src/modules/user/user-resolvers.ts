@@ -85,10 +85,20 @@ const userResolver = {
 		},
 		updateUserProfile: async (
 			obj: any,
-			{ user }: InputUser,
-			{ user: { uid = '' }, roles }: AuthData
+			{ user: inputUser }: InputUser,
+			{ user, roles }: AuthData
 		): Promise<UpdateProfileResponse> => {
-			const response = await serviceUpdateProfile(uid, user)
+			console.log('updateUserProfile: userAuth = ', user)
+			console.log('updateUserProfile: inputUser = ', inputUser)
+			if (!user) {
+				return {
+					__typename: 'ErrorResponse',
+					error: {
+						message: 'Não foi encontrado um usuario na sessão',
+					},
+				}
+			}
+			const response = await serviceUpdateProfile(`${user.uid}`, inputUser)
 			return response
 		},
 	},

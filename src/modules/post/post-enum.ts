@@ -3,6 +3,7 @@ export enum EPostTypesNames {
 	'GetPostsOwner' = 'GetPostsOwner',
 	'GetPost' = 'GetPost',
 	'CreatePost' = 'CreatePost',
+	'RemovePost' = 'RemovePost',
 	'ClapPost' = 'ClapPost',
 	'ErrorResponse' = 'ErrorResponse',
 }

@@ -3,6 +3,7 @@ import { success } from './../../models/success'
 import { error } from './../../models/error'
 import { Post } from './../../entities/post'
 import { Profile } from './../../entities/user'
+import { MediaMetaData } from 'src/entities/mediaData'
 
 interface TypeName {
 	__typename: keyof typeof EPostTypesNames
@@ -26,6 +27,10 @@ export interface PostCreatePost extends TypeName, success, error {
 	createPost?: Post
 }
 
+export interface PostDeletePost extends TypeName, success, error {
+	post?: string
+}
+
 export interface PostClapPost extends TypeName, success, error {
 	post?: string
 }
@@ -42,6 +47,8 @@ export interface IGetPostID {
 
 export interface ICreatePost {
 	post: Post
+	metadata: MediaMetaData
+	ownerProfile: Profile
 }
 
 export interface IClapPost {

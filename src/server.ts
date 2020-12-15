@@ -6,6 +6,7 @@ import typeDefs from './graphql/types-defs'
 import resolvers from './graphql/resolvers'
 import { AuthDirective } from './directives/auth-directive'
 import { RolesDirective } from './directives/role-directive'
+import { MuxWebhooks } from './webhooks/muxHooks'
 
 interface Context {
 	req: Request
@@ -31,6 +32,8 @@ const server = new ApolloServer({
 const app: Application = express()
 
 const PORT = process.env.PORT || 8090
+
+app.use('/guup/api', MuxWebhooks)
 
 server.applyMiddleware({ app, path: '/graphql' })
 

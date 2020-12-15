@@ -153,7 +153,6 @@ export const serviceAuthSignin = async ({
 	let user: User = {}
 	verifyUser.forEach((data) => {
 		const { profile, role }: User = data.data()
-		console.log('verify user profile: ', profile)
 		user = {
 			uid: data.id,
 			profile,
@@ -214,9 +213,13 @@ export const serviceAuthSignup = async ({
 			displayName: user.displayName,
 		},
 	}
-	await userRef.add(completeUser)
+	const newUserId = await userRef.add(completeUser)
+	const newUser: User = {
+		...completeUser,
+		uid: newUserId.id,
+	}
 	const { token, refreshToken } = jwtGenerateToken({
-		user: { ...completeUser },
+		user: newUser,
 		roles: user.role || '',
 	})
 	return {

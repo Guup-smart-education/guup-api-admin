@@ -36,6 +36,7 @@ input ICourse {
 	area: EnumAreas!
 	typeContent: EnumContentType!
 	difficult: EnumLevels!
+	photoURL: String!
 }
 
 input IMetaData {
@@ -101,6 +102,11 @@ type Query {
 ## Mutations
 type Mutation {
 	updateCourse(course: ICourse): UUpdateCourse @auth
-	createCourse(course: ICourse!, metadata: IMetaData!): UCreateCourse @auth
-	removeCourse(course: String): URemoveCourse @auth
+	createCourse(
+		course: ICourse!
+		videoMetadata: IMetaData!
+		coverMetadata: IMetaData!
+		ownerProfile: IProfile!
+	): UCreateCourse @auth
+	removeCourse(course: String!): URemoveCourse @auth
 }

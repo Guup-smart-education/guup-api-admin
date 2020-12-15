@@ -26,6 +26,7 @@ import {
 	serviceUpdatePathOwners,
 	serviceRemoveCourse,
 } from './courses-service'
+import { PostDeletePost } from '../post/post'
 
 const postResolvers = {
 	URemoveCourse: {
@@ -117,17 +118,18 @@ const postResolvers = {
 	Mutation: {
 		createCourse: async (
 			obj: any,
-			{ course, metadata }: InputCourse,
+			{ course, videoMetadata, coverMetadata, ownerProfile }: InputCourse,
 			{ user: { uid, profile } }: AuthData
 		): Promise<PostCourseResponse> => {
-			console.log('createCourse: ', profile)
+			console.log('ownerProfile: ', ownerProfile)
 			const response = await serviceCreateCourse(
 				{
 					...course,
 					owner: uid,
-					ownerProfile: { ...profile },
+					ownerProfile: ownerProfile || { ...profile },
 				},
-				metadata
+				videoMetadata,
+				coverMetadata
 			)
 			// if (response.__typename === 'CreateCourse' && course.path) {
 			// 	await serviceUpdatePathOwners(course.path, { uid, ...args })

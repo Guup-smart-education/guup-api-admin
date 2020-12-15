@@ -1,69 +1,30 @@
 import { Comment } from './comment'
 import { Profile } from './user'
+import { MediaMetaData } from './mediaData'
 
-// export interface CommonCourseData {
-// 	id?: string
-// 	title?: string
-// 	description?: string
-// 	type?: string
-// }
-// export interface CourseModuleContent extends CommonCourseData {}
-// export interface CourseRatingComments extends CommonCourseData {}
-// export interface CourseProjects extends CommonCourseData {
-// 	contentHours: Number
-// }
-// export interface CourseModules extends CommonCourseData {
-// 	progress?: Number
-// 	numberProjects?: Number
-// 	numberContent?: Number
-// 	contentHours?: Number
-// 	content?: [CourseModuleContent]
-// 	projects?: [CourseProjects]
-// }
-// export interface CourseAchievements extends CommonCourseData {}
-// export interface CoursePrerequisites extends CommonCourseData {}
-// export interface CourseGains extends CommonCourseData {}
-
-export interface MediaMetaData {
-	fileBucket: string
-	fileFullPath: string
-	fileContentType: string
-}
 export interface Courses extends CommonCourseData {
-	// subtitle?: string
-	// area?: string
-	// duration?: Number
-	// owner?: string
-	// ownerName?: string
-	// ownerRole?: string
-	// ratingValue?: Number
-	// enrolledUsers?: [CourseUser]
-	// ratingComments?: [CourseRatingComments]
-	// modules?: [CourseModules]
-	// achievements?: [CourseAchievements]
-	// prerequisites?: [CoursePrerequisites]
-	// gains?: [CourseGains]
-	id?: string
-	path?: string
-	owner?: string
-	title?: string
-	description?: string
-	photoURL?: string
-	videoURL?: string
-	thumbnailURL?: string
-	gifURL?: string
-	videoAssetId?: string
-	videoPlaybackID?: string
-	area?: string
-	typeContent?: string
-	difficult?: string
-	viewsCount?: Number
-	clapsCount?: Number
-	claps?: [string]
-	commentsCount?: Number
-	comments?: [Comment]
-	ownerProfile?: Profile
-	createdAt?: any
-	state?: string
-	metadata?: MediaMetaData
+	readonly id?: string
+	readonly path?: string
+	readonly owner?: string
+	readonly title?: string
+	readonly description?: string
+	readonly photoURL?: string
+	readonly videoURL?: string
+	readonly thumbnailURL?: string
+	readonly gifURL?: string
+	readonly videoAssetId?: string
+	readonly videoPlaybackID?: string
+	readonly area?: string
+	readonly typeContent?: string
+	readonly difficult?: string
+	readonly viewsCount?: Number
+	readonly clapsCount?: Number
+	readonly claps?: [string]
+	readonly commentsCount?: Number
+	readonly comments?: [Comment]
+	readonly ownerProfile?: Profile
+	readonly createdAt?: any
+	readonly state?: string
+	readonly videoMetadata?: MediaMetaData
+	readonly coverMetadata?: MediaMetaData
 }

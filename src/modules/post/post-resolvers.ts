@@ -8,6 +8,7 @@ import {
 	GetPostOwnerList,
 	// Post
 	PostCreatePost,
+	PostDeletePost,
 	PostClapPost,
 	// Inputs
 	IGetPostOwner,
@@ -20,6 +21,7 @@ import {
 	serviceGetPostsByOwner,
 	serviceGetPostsByID,
 	serviceCreatepost,
+	serviceRemovePost,
 	serviceClapPost,
 } from './post-service'
 
@@ -48,6 +50,13 @@ const resolvers = {
 	UCreatePost: {
 		__resolveType: (obj: PostCreatePost, contex: any, info: any) => {
 			if (obj.createPost) return EPostTypesNames.CreatePost
+			if (obj.error) return EPostTypesNames.ErrorResponse
+			return null
+		},
+	},
+	URemovePost: {
+		__resolveType: (obj: PostDeletePost, contex: any, info: any) => {
+			if (obj.post || obj.success) return EPostTypesNames.RemovePost
 			if (obj.error) return EPostTypesNames.ErrorResponse
 			return null
 		},
@@ -85,12 +94,24 @@ const resolvers = {
 	Mutation: {
 		createPost: async (
 			obj: any,
-			{ post }: ICreatePost,
+			{ post, ownerProfile, metadata }: ICreatePost,
 			{ user: { uid, profile } }: AuthData
 		): Promise<PostCreatePost> => {
 			return await serviceCreatepost({
-				post: { ...post, owner: uid, ownerProfile: { ...profile } },
+				post: {
+					...post,
+					owner: uid,
+				},
+				metadata,
+				ownerProfile: ownerProfile || profile,
 			})
+		},
+		removePost: async (
+			obj: any,
+			{ post }: any,
+			context: any
+		): Promise<PostDeletePost> => {
+			return await serviceRemovePost(post)
 		},
 		clapPost: async (
 			obj: any,

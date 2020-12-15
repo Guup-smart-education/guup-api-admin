@@ -33,6 +33,11 @@ type CreatePost {
 	success: Success
 }
 
+type RemovePost {
+	post: String
+	success: Success
+}
+
 type ClapPost {
 	post: String
 	success: Success
@@ -43,6 +48,7 @@ union UGetAllPost = GetPosts | ErrorResponse
 union UGetPostsByOwner = GetPostsOwner | ErrorResponse
 union UGetPost = GetPost | ErrorResponse
 union UCreatePost = CreatePost | ErrorResponse
+union URemovePost = RemovePost | ErrorResponse
 union UClapPost = ClapPost | ErrorResponse
 
 ## Queries
@@ -54,6 +60,11 @@ type Query {
 
 ## Mutations
 type Mutation {
-	createPost(post: InputPost!): UCreatePost @auth
+	createPost(
+		post: InputPost!
+		metadata: IMetaData
+		ownerProfile: IProfile!
+	): UCreatePost @auth
+	removePost(post: String!): URemovePost @auth
 	clapPost(collection: ClapFor!, post: String!): UClapPost @auth
 }

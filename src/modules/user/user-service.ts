@@ -16,10 +16,9 @@ export const serviceGetUser = (uid: string): Promise<GetUserResponse> => {
 			.get()
 			.then((data) => {
 				const user = data.data()
-				console.log('GetUserResponse', user)
 				resolve({
 					__typename: 'GetUser',
-					user,
+					user: { ...user, uid },
 					success: {
 						message: user
 							? 'Usuaruio encontrado com sucesso'
@@ -124,6 +123,8 @@ export const serviceUpdateProfile = (
 	uid: string,
 	user: User
 ): Promise<UpdateProfileResponse> => {
+	console.log('serviceUpdateProfile uid: ', uid)
+	console.log('serviceUpdateProfile user: ', uid)
 	const usersRef = db.collection(collections.users).doc(uid)
 	return new Promise((resolve, reject) => {
 		usersRef

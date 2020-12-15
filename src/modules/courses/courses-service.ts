@@ -16,12 +16,19 @@ import {
 import { Courses, MediaMetaData } from './../../entities/courses'
 import { Profile } from './../../entities/user'
 import { Path } from './../../entities/path'
-import { TypesErrors } from './../../data/enums'
+import { MuxAsset } from './../../entities/mux'
+import { TypesErrors, EMediaState } from './../../data/enums'
 import { ErrorGenerator } from './../../utils/error-utils'
 import { db, collections, storage } from './../../firebase/firebase'
 import { FirebaseError, firestore } from 'firebase-admin'
 import { LIMIT_LIST } from '../../constants'
-import { MuxCreateAsset, MuxGetPlaybackID } from '../../service/mux-service'
+import {
+	MuxCreateAsset,
+	MuxGetPlaybackID,
+	MuxGenerateThumbnail,
+	MuxGenerateGif,
+	MuxDeleteAsset,
+} from '../../service/mux-service'
 
 dotenv.config()
 
@@ -102,7 +109,6 @@ export const serviceGetCoursesByUser = async (
 				data.forEach((doc) => {
 					const course = { id: doc.id, ...doc.data() }
 					coursesByOwner.push(course)
-					console.log(doc.id, `Doc`, course)
 				})
 				resolve({
 					__typename: 'GetCoursesByOwner',
@@ -128,7 +134,6 @@ export const serviceGetCoursesByPath = async (
 	path: string,
 	lastCourse?: string
 ): Promise<GetCoursesByPath> => {
-	console.log('path: ', path)
 	const courseRef = db.collection(collections.courses)
 	let snapShot: any = null
 	if (lastCourse) {
@@ -215,12 +220,53 @@ export const serviceGetCourseDetailByUser = (
 
 // Post
 
-export const serviceRemoveCourse = (
+export const serviceRemoveCourse = async (
 	course: string
 ): Promise<RemoveCourseResponse> => {
+	const courseRef = db.collection(collections.courses).doc(course)
+	const data = await courseRef.get()
+	const courseToDelete: Courses | undefined = data.data()
+	if (!data || !courseToDelete) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.NOT_FOUND,
+				message: `Conteudo não encontrado com ID: ${course}`,
+			},
+		}
+	}
+	// Mux delete data
+	const muxDeleteResponse: any = await MuxDeleteAsset(
+		`${courseToDelete.videoAssetId}`
+	)
+	console.log('muxResponse: ', muxDeleteResponse)
+
+	// TODO: O ue fazer quando de um erro na hora de eliminar um video no MUX?
+	// if (muxResponse.error) {
+	// 	return {
+	// 		__typename: 'ErrorResponse',
+	// 		error: {
+	// 			type: TypesErrors.ERROR,
+	// 			message: `Aconteceu um erro eliminado o mux asset: ${asseetId}`,
+	// 		},
+	// 	}
+	// }
+	// End mux delete data
+	// Firebase update (Remove media from firestorage)
+	if (courseToDelete.videoMetadata && courseToDelete.coverMetadata) {
+		const { videoMetadata, coverMetadata } = courseToDelete
+		await storage
+			.bucket(videoMetadata.fileBucket)
+			.file(videoMetadata.fileFullPath)
+			.delete()
+		await storage
+			.bucket(coverMetadata.fileBucket)
+			.file(coverMetadata.fileFullPath)
+			.delete()
+	}
+	// End firebase update
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
-			.doc(course)
+		courseRef
 			.delete()
 			.then(() => {
 				resolve({
@@ -265,9 +311,10 @@ export const serviceUpdateCourse = (
 
 export const serviceCreateCourse = async (
 	course: Courses,
-	metadata: MediaMetaData
+	videoMetadata: MediaMetaData,
+	coverMetadata: MediaMetaData
 ): Promise<PostCourseResponse> => {
-	if (!metadata) {
+	if (!videoMetadata || !coverMetadata) {
 		return {
 			__typename: 'ErrorResponse',
 			error: {
@@ -277,40 +324,81 @@ export const serviceCreateCourse = async (
 		}
 	}
 	const [filePublic] = await storage
-		.bucket(metadata.fileBucket)
-		.file(`${metadata.fileFullPath}`)
+		.bucket(videoMetadata.fileBucket)
+		.file(`${videoMetadata.fileFullPath}`)
 		.makePublic()
 	const videoURL: string = `${process.env.GCLOUD_STORAGE_ADDRESS}/${filePublic.bucket}/${filePublic.object}`
 	// Creating a Video Asset
-	const muxCreateAsset: any = await MuxCreateAsset(videoURL, 'public')
-	const videoAssetId = `${muxCreateAsset.id}`
-	// Creating a playback Id
-	const muxPlayBackId: any = await MuxGetPlaybackID(videoAssetId)
-	const videoPlaybackID = `${muxPlayBackId.id}`
-	console.log('playBackId: ', muxPlayBackId)
-	const thumbnailURL = `https://image.mux.com/${videoPlaybackID}/thumbnail.png?width=420`
-	const gifURL = `https://image.mux.com/${videoPlaybackID}/animated.gif?fps=30&width=420`
+	const muxCreateAsset: MuxAsset = await MuxCreateAsset(videoURL, 'public')
 	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
 		db.collection(collections.courses)
 			.add({
 				...course,
 				createdAt,
-				metadata,
+				videoMetadata,
+				coverMetadata,
 				videoURL,
-				videoAssetId,
-				videoPlaybackID,
-				thumbnailURL,
-				gifURL,
+				videoAssetId: muxCreateAsset.id,
+				state: EMediaState.preparing,
 			})
 			.then(({ id }) => {
-				console.info('Course data', id)
 				resolve({
 					__typename: 'CreateCourse',
 					createCourse: id,
 					success: {
 						message: 'Course added successfull',
 					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+	})
+}
+
+export const serviceUpdateCourseMedia = async (
+	videoAssetId: string,
+	state: keyof typeof EMediaState
+): Promise<UpdatePathCourses> => {
+	const ref = db.collection(collections.courses)
+	const data = await ref.where('videoAssetId', '==', videoAssetId).get()
+	let course: Courses | undefined
+	await data.forEach((doc) => {
+		course = { id: doc.id, ...doc.data() }
+	})
+	console.log('**************')
+	console.log('serviceUpdateCourseMedia: course => ', course)
+	console.log('**************')
+	if (!course) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				message: `Não foi encontrado a referencia do video com id ${videoAssetId}`,
+			},
+		}
+	}
+	// Getting mux data
+	const muxPlayBackId: any = await MuxGetPlaybackID(videoAssetId)
+	const videoPlaybackID = `${muxPlayBackId.id}`
+	const thumbnailURL = MuxGenerateThumbnail(videoPlaybackID)
+	const gifURL = MuxGenerateGif(videoPlaybackID)
+	// Updating course
+	return new Promise(async (resolve, reject) => {
+		ref
+			.doc(`${course?.id}`)
+			.update({
+				videoPlaybackID,
+				thumbnailURL,
+				gifURL,
+				state,
+			})
+			.then(() => {
+				resolve({
+					__typename: 'UpdateCourse',
 				})
 			})
 			.catch(({ code, message }: FirebaseError) => {
@@ -339,7 +427,6 @@ export const serviceUpdatePathOwners = async (
 		}
 	}
 	const owners = R.union(path.owners || [], [owner])
-	console.log('path.contentCount: ', path.contentCount)
 	const contentCount = path.contentCount ? path.contentCount + 1 : 0
 	return new Promise((resolve, reject) => {
 		pathRef
@@ -370,7 +457,6 @@ export const serviceGetCourseById = async (
 			'courses/49V0ly7JwjgcGk78WNEp/7c4b2b4c-b557-4a34-9609-6cedaf7638dd.mp4'
 		)
 	const [file] = await ref.makePublic()
-	console.log('file: ', file)
 
 	// .getSignedUrl({
 	// 	action: 'read',
@@ -382,7 +468,6 @@ export const serviceGetCourseById = async (
 	// })
 	// .catch((e) => console.log('makePublic error: ', e))
 	return new Promise((resolve, reject) => {
-		console.log('course by id')
 		db.collection(collections.courses)
 			.doc(course)
 			.get()

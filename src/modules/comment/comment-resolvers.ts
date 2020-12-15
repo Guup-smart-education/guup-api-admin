@@ -55,7 +55,7 @@ const reviewsResolvers = {
 		): Promise<PostCreateComment> => {
 			return await servicePostComment({
 				collection,
-				comment: { ...comment, owner: uid, ownerProfile: { ...profile } },
+				comment: { ...comment, owner: uid },
 			})
 		},
 	},

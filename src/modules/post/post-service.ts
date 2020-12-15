@@ -11,13 +11,15 @@ import {
 	IClapPost,
 	PostClapPost,
 	GetPostOwnerList,
+	PostDeletePost,
 } from './post'
 import { ErrorGenerator, EErrorCode } from './../../utils/error-utils'
-import { db, collections } from './../../firebase/firebase'
+import { db, collections, storage } from './../../firebase/firebase'
 import { FirebaseError, firestore } from 'firebase-admin'
 import { Post } from '../../entities/post'
 import { LIMIT_LIST } from '../../constants'
 import R from 'ramda'
+import { TypesErrors } from './../../data/enums'
 
 // Get
 
@@ -155,12 +157,14 @@ export const serviceGetPostsByID = ({ id }: IGetPostID): Promise<GetPost> => {
 
 export const serviceCreatepost = ({
 	post,
+	ownerProfile,
+	metadata,
 }: ICreatePost): Promise<PostCreatePost> => {
 	const postRef = db.collection(collections.posts)
 	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
 		postRef
-			.add({ ...post, createdAt })
+			.add({ ...post, ownerProfile, metadata, createdAt })
 			.then(({ id }) => {
 				resolve({
 					__typename: 'CreatePost',
@@ -186,11 +190,64 @@ export const serviceCreatepost = ({
 	})
 }
 
+export const serviceRemovePost = async (
+	id: string
+): Promise<PostDeletePost> => {
+	const postRef = db.collection(collections.posts).doc(id)
+	const data = await postRef.get()
+	const postDelete: Post | undefined = data.data()
+
+	if (!data || !postDelete) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.NOT_FOUND,
+				message: `Publicacao nao encontrada com ID: ${id}`,
+			},
+		}
+	}
+	// Firestore update (Remove post image)
+	if (postDelete.metadata) {
+		await storage
+			.bucket(postDelete.metadata.fileBucket)
+			.file(postDelete.metadata.fileFullPath)
+			.delete()
+	}
+	// End firestore
+
+	return new Promise((resolve, reject) => {
+		postRef
+			.delete()
+			.then((response) => {
+				console.log(`Remove post succesfull: `, response)
+				resolve({
+					__typename: 'RemovePost',
+					post: id,
+					success: {
+						message: `Publicacao removida com sucesso: ID ${id}`,
+					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) =>
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			)
+			.catch(({ code, message }: FirebaseError) => {
+				reject(ErrorGenerator(code, message))
+			})
+	})
+}
+
 export const serviceClapPost = async ({
 	post,
 	collection,
 	owner,
 }: IClapPost): Promise<PostClapPost> => {
+	console.log('serviceClapPost: post => ', post)
+	console.log('serviceClapPost: collection => ', collection)
+	console.log('serviceClapPost: owner => ', owner)
 	const postRef = db
 		.collection(
 			collection === 'COURSE' ? collections.courses : collections.posts
@@ -216,7 +273,7 @@ export const serviceClapPost = async ({
 					__typename: 'ClapPost',
 					post,
 					success: {
-						message: 'Post created successfully',
+						message: `Clap ${collections} succesfull`,
 					},
 				})
 			})

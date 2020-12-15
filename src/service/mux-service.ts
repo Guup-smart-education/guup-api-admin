@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
 import axios from 'axios'
+import { MuxAsset } from './../entities/mux.d'
 
 dotenv.config()
 
@@ -17,16 +18,13 @@ const API = axios.create({
 export const MuxCreateAsset = (
 	input: string,
 	playback_policy: [string] | string
-) => {
+): Promise<MuxAsset> => {
 	return new Promise((resolve, reject) => {
 		API.post(`/assets`, {
 			input,
 			playback_policy,
 		})
-			.then(({ data }) => {
-				console.log('MuxCreateAsset: [SUCCESS] ', data)
-				resolve(data.data || data)
-			})
+			.then(({ data }) => resolve(data.data || data))
 			.catch((e) => {
 				console.log('MuxCreateAsset [ERROR] ', e)
 				reject(e)
@@ -34,13 +32,24 @@ export const MuxCreateAsset = (
 	})
 }
 
-export const MuxGetAsset = (assetsId: string) => {
+export const MuxDeleteAsset = (assetId: string) => {
+	return new Promise((resolve, reject) => {
+		API.delete(`/assets/${assetId}`)
+			.then((response) => {
+				console.log(`Asset deleted with success: ${response.data}`)
+				resolve(response)
+			})
+			.catch((e) => {
+				console.log('MuxDeleteAsset: ', e)
+				reject(e)
+			})
+	})
+}
+
+export const MuxGetAsset = (assetsId: string): Promise<MuxAsset> => {
 	return new Promise((resolve, reject) => {
 		API.get(`/assets/${assetsId}`)
-			.then(({ data }) => {
-				console.log('MuxGetAsset: [SUCCESS] ', data)
-				resolve(data.data || data)
-			})
+			.then(({ data }) => resolve(data.data || data))
 			.catch((e) => {
 				console.log('MuxGetAsset: [ERROR] ', e)
 				reject(e)
@@ -53,13 +62,16 @@ export const MuxGetPlaybackID = (assetsId: string) => {
 		API.post(`/assets/${assetsId}/playback-ids`, {
 			policy: 'public',
 		})
-			.then(({ data }) => {
-				console.log('MUXGetPlaybackID: [SUCCESS]', data)
-				resolve(data.data || data)
-			})
+			.then(({ data }) => resolve(data.data || data))
 			.catch((e) => {
 				console.log('MUXGetPlaybackID: [ERROR]', e)
 				reject(e)
 			})
 	})
 }
+
+export const MuxGenerateThumbnail = (videoPlaybackID: string) =>
+	`https://image.mux.com/${videoPlaybackID}/thumbnail.png?width=420`
+
+export const MuxGenerateGif = (videoPlaybackID: string) =>
+	`https://image.mux.com/${videoPlaybackID}/animated.gif?fps=30&width=420`

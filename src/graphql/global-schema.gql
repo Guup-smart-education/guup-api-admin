@@ -227,12 +227,14 @@ type Course {
 	viewsCount: Float
 	clapsCount: Float
 	claps: [String]
+	clapped: Boolean
 	commentsCount: Float
 	comments: [Comments]
 	ownerProfile: UserProfile
 	createdAt: Date
 	state: MediaState
-	metadata: MediaMetaData
+	videoMetadata: MediaMetaData
+	coverMetadata: MediaMetaData
 }
 
 ## Users
@@ -294,11 +296,13 @@ type Post {
 	linkURL: String
 	viewsCount: Float
 	commentsCount: Float
+	clapped: Boolean
 	clapsCount: Float
 	claps: [String]
 	comments: [Comments]
 	ownerProfile: UserProfile
 	createdAt: Date
+	metadata: MediaMetaData
 }
 
 ## Review

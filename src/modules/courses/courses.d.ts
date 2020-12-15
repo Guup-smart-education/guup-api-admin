@@ -4,7 +4,7 @@ import {
 	CourseModuleContent,
 	MediaMetaData,
 } from './../../entities/courses'
-import { User } from './../../entities/user'
+import { User, Profile } from './../../entities/user'
 import { error } from './../../models/error'
 import { success } from './../../models/success'
 import { CoursesTypesNames } from './courses-enum'
@@ -85,7 +85,9 @@ export interface InputUser {
 
 export interface InputCourse {
 	course: Courses
-	metadata: MediaMetaData
+	videoMetadata: MediaMetaData
+	coverMetadata: MediaMetaData
+	ownerProfile: Profile
 }
 
 export interface InputCourseId {
