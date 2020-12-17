@@ -13,7 +13,8 @@ import {
 	RemoveCourseResponse,
 	GetCoursesByOwner,
 } from './courses'
-import { Courses, MediaMetaData } from './../../entities/courses'
+import { Courses } from './../../entities/courses'
+import { MediaMetaData } from './../../entities/mediaData'
 import { Profile } from './../../entities/user'
 import { Path } from './../../entities/path'
 import { MuxAsset } from './../../entities/mux'

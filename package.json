@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
 		"start": "ts-node dist/server.js",
-		"build": "tsc",
+		"build": "rm -rf dist && tsc && copyfiles -f src/**/**/*.gql src/**/*.gql dist/graphql/",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"show:prettie": "prettier --write .",
 		"install:clean": "rm -rf node_modules && yarn"

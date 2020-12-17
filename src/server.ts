@@ -7,6 +7,7 @@ import resolvers from './graphql/resolvers'
 import { AuthDirective } from './directives/auth-directive'
 import { RolesDirective } from './directives/role-directive'
 import { MuxWebhooks } from './webhooks/muxHooks'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
 interface Context {
 	req: Request
@@ -14,9 +15,12 @@ interface Context {
 
 dotenv.config()
 
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+
 const server = new ApolloServer({
-	typeDefs,
-	resolvers,
+	// typeDefs,
+	// resolvers,
+	schema,
 	schemaDirectives: {
 		auth: AuthDirective,
 		hasRole: RolesDirective,

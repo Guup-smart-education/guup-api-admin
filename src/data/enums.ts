@@ -70,7 +70,6 @@ export enum EMuxEvents {
 	'video_live_stream_disconnected' = 'video.live_stream.disconnected',
 	'video_live_stream_idle' = 'video.live_stream.idle',
 	'video_live_stream_updated' = 'video.live_stream.updated',
-	'video_live_stream_updated' = 'video.live_stream.updated',
 	'video_live_stream_enabled' = 'video.live_stream.enabled',
 	'video_live_stream_deleted' = 'video.live_stream.deleted',
 	// Simulcast events"

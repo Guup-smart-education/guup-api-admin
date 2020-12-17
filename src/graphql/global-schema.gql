@@ -329,3 +329,5 @@ type JWT {
 	token: String
 	refreshToken: String
 }
+
+type Query

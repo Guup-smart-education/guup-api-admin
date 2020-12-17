@@ -39,6 +39,12 @@ const userResolver = {
 			return null
 		},
 	},
+	Query: {
+		authQuery: (obj: any, data: InputRequestAccess, context: any) => {
+			console.log('Data authQuery: ', data)
+			return data
+		},
+	},
 	Mutation: {
 		authRequestAccess: async (
 			obj: any,
@@ -62,11 +68,6 @@ const userResolver = {
 			context: any
 		): Promise<ExtendSignupResponse> => {
 			const response = await serviceAuthSignup(user)
-			// if (error) {
-			// 	console.log('serviceOnCreateAuth message:', args)
-			// 	return { ...args, error }
-			// }
-			// const response = await serviceOnCreateAuth(uid || '', user)
 			return response
 		},
 	},
