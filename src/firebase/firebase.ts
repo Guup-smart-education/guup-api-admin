@@ -1,10 +1,13 @@
 import { DataCollection } from '../data/collections'
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv-flow'
 import * as firebaseFuctions from 'firebase-functions'
 import firebaseAdmin from 'firebase-admin'
 import { admin } from 'firebase-admin/lib/database'
 
-dotenv.config()
+dotenv.config({
+	default_node_env: 'development',
+	silent: true,
+})
 
 const serviceAccount = require(`${process.env.FIREBASE_CONFIG}`)
 

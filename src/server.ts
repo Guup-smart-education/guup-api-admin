@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv-flow'
 import express, { Application, Request, Response } from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import { getUserScope } from './utils/auth-utils'
@@ -13,7 +13,14 @@ interface Context {
 	req: Request
 }
 
-dotenv.config()
+dotenv.config({
+	default_node_env: 'development',
+	silent: true,
+})
+
+console.log('**********ENVIROMENT**********')
+console.log(`**********${process.env.ENV_NAME}**********`)
+console.log('**********ENVIROMENT**********')
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 

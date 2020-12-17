@@ -1,8 +1,11 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv-flow'
 import axios from 'axios'
 import { MuxAsset } from './../entities/mux.d'
 
-dotenv.config()
+dotenv.config({
+	default_node_env: 'development',
+	silent: true,
+})
 
 const API = axios.create({
 	baseURL: `${process.env.MUX_API_URL}`,

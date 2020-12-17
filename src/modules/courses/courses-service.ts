@@ -1,5 +1,5 @@
 import R from 'ramda'
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv-flow'
 import {
 	// Gets
 	GetCoursesByUserResponse,
@@ -31,7 +31,10 @@ import {
 	MuxDeleteAsset,
 } from '../../service/mux-service'
 
-dotenv.config()
+dotenv.config({
+	default_node_env: 'development',
+	silent: true,
+})
 
 // Get
 
