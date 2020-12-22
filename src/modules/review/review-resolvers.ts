@@ -1,3 +1,4 @@
+import { EReviewTypesNames } from './review-enum'
 import {
 	// Gets
 	GetReviewList,
@@ -16,6 +17,20 @@ import {
 import { AuthData } from './../../models/auth'
 
 const reviewsResolvers = {
+	UGetReview: {
+		__resolveType: (obj: GetReviewList, contex: any, info: any) => {
+			if (obj.reviews) return EReviewTypesNames.GetReview
+			if (obj.error) return EReviewTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UPostReview: {
+		__resolveType: (obj: PostCreateReview, contex: any, info: any) => {
+			if (obj.review) return EReviewTypesNames.PostReview
+			if (obj.error) return EReviewTypesNames.ErrorResponse
+			return null
+		},
+	},
 	Query: {
 		getReviewByCourse: async (
 			obj: any,

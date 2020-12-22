@@ -1,13 +1,16 @@
-import R from 'ramda'
 import { AuthData } from './../../models/auth'
+import { CoursesTypesNames } from './courses-enum'
 import { Courses } from './../../entities/courses'
 import {
 	// Gets
 	GetCoursesResponse,
-	GetCoursesByUserResponse,
 	GetCourseById,
+	GetCoursesByPath,
+	GetCoursesByOwner,
 	// Posts
 	PostCourseResponse,
+	UptCourseResponse,
+	RemoveCourseResponse,
 	// Inputs
 	InputCourse,
 	InputCourseId,
@@ -20,32 +23,87 @@ import {
 	serviceCreateCourse,
 	serviceGetCourseById,
 	serviceGetCoursesByPath,
+	serviceUpdatePathOwners,
+	serviceRemoveCourse,
 } from './courses-service'
+import { PostDeletePost } from '../post/post'
 
 const postResolvers = {
+	URemoveCourse: {
+		__resolveType: (obj: RemoveCourseResponse, contex: any, info: any) => {
+			if (obj.removeCourse) return CoursesTypesNames.RemoveCourse
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UUpdateCourse: {
+		__resolveType: (obj: UptCourseResponse, contex: any, info: any) => {
+			if (obj.updateCourse) return CoursesTypesNames.UpdateCourse
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UCreateCourse: {
+		__resolveType: (obj: PostCourseResponse, contex: any, info: any) => {
+			if (obj.createCourse) return CoursesTypesNames.CreateCourse
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetCourses: {
+		__resolveType: (obj: GetCoursesResponse, contex: any, info: any) => {
+			if (obj.courses) return CoursesTypesNames.GetCourses
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetCoursesByPath: {
+		__resolveType: (obj: GetCoursesByPath, contex: any, info: any) => {
+			if (obj.coursesByPath) return CoursesTypesNames.GetCoursesByPath
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetCoursesByOwner: {
+		__resolveType: (obj: GetCoursesByOwner, contex: any, info: any) => {
+			if (obj.coursesByOwner) return CoursesTypesNames.GetCoursesByOwner
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetCourseDetail: {
+		__resolveType: (obj: GetCourseById, contex: any, info: any) => {
+			if (obj.course) return CoursesTypesNames.GetCourseDetail
+			if (obj.error) return CoursesTypesNames.ErrorResponse
+			return null
+		},
+	},
 	Query: {
 		getCourses: async (
 			obj: any,
-			args: any,
+			{ lastCourse }: { lastCourse: string },
 			context: any
 		): Promise<GetCoursesResponse> => {
-			const response = await serviceGetCourses()
+			const response = await serviceGetCourses(lastCourse)
 			return response
 		},
 		getCoursesByUser: async (
 			obj: any,
-			{ uid }: InputUser,
+			{ uid, lastCourse }: InputUser,
 			{ user: { uid: uidToken }, roles }: AuthData
-		): Promise<GetCoursesByUserResponse> => {
-			const response = await serviceGetCoursesByUser(uid || uidToken || '')
+		): Promise<GetCoursesByOwner> => {
+			const response = await serviceGetCoursesByUser(
+				uid || uidToken || '',
+				lastCourse
+			)
 			return response
 		},
 		getCoursesByPath: async (
 			obj: any,
-			{ path }: InputCoursePath,
+			{ path, lastCourse }: InputCoursePath,
 			context: any
-		): Promise<GetCoursesByUserResponse> => {
-			const response = await serviceGetCoursesByPath(path)
+		): Promise<GetCoursesByPath> => {
+			const response = await serviceGetCoursesByPath(path, lastCourse)
 			return response
 		},
 		getCourseByID: async (
@@ -60,15 +118,30 @@ const postResolvers = {
 	Mutation: {
 		createCourse: async (
 			obj: any,
-			{ course }: InputCourse,
-			{ user: { uid, displayName, photoURL, experience } }: AuthData
+			{ course, videoMetadata, coverMetadata, ownerProfile }: InputCourse,
+			{ user: { uid, profile } }: AuthData
 		): Promise<PostCourseResponse> => {
-			const response = await serviceCreateCourse({
-				...course,
-				owner: uid,
-				ownerProfile: { displayName, photoURL, experience },
-			})
+			console.log('ownerProfile: ', ownerProfile)
+			const response = await serviceCreateCourse(
+				{
+					...course,
+					owner: uid,
+					ownerProfile: ownerProfile || { ...profile },
+				},
+				videoMetadata,
+				coverMetadata
+			)
+			// if (response.__typename === 'CreateCourse' && course.path) {
+			// 	await serviceUpdatePathOwners(course.path, { uid, ...args })
+			// }
 			return response
+		},
+		removeCourse: async (
+			obj: any,
+			{ course }: any,
+			{ user: { uid, ...args } }: AuthData
+		): Promise<RemoveCourseResponse> => {
+			return serviceRemoveCourse(course)
 		},
 		// addCourseModule: async (
 		// 	obj: any,

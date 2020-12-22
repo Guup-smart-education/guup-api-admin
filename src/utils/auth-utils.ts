@@ -1,8 +1,11 @@
-import * as dotenv from 'dotenv'
+// import './../config/enviroment'
 import jwt, { JsonWebTokenError } from 'jsonwebtoken'
 import { AuthData } from './../models/auth'
 
-dotenv.config()
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
 
 enum JwtCenarios {
 	TokenAccessVerified = 'TOKEN_VERIFIED',
@@ -18,7 +21,6 @@ enum JwtErrorMessages {
 
 export const getUserScope = (token: string): any => {
 	const cleanToken = token.replace(`${process.env.AUTH_PREFIX_HEADER} `, '')
-	// const verify = verifyAccessToken(token)
 	const tokenDecode = jwt.decode(cleanToken)
 	return tokenDecode || {}
 }

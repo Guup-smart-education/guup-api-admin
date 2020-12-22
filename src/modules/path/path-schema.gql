@@ -1,12 +1,36 @@
+## Enum
+enum PathType {
+	PATH
+	COURSE
+}
+
+enum PathAccess {
+	LIMIT_ACCESS
+	FOR_EVERYONE
+}
+
+enum PathStatus {
+	WAITING
+	PUBLISHED
+	DELETED
+	PAUSED
+}
+
 ## Inputs
 input InputPath {
 	title: String!
 	description: String!
+	photoURL: String
 }
 
 ## Types
 type GetPaths {
 	allPaths: [Path]
+	success: Success
+}
+
+type GetPathsOwner {
+	allPathsOwner: [Path]
 	success: Success
 }
 
@@ -20,19 +44,31 @@ type CreatePath {
 	success: Success
 }
 
+type UpdateStatusPath {
+	updateStatus: String
+	success: Success
+}
+
 ## Unions
 union UGetAllPaths = GetPaths | ErrorResponse
+union UGetPathsOwner = GetPathsOwner | ErrorResponse
 union UGetPath = GetPath | ErrorResponse
 union UCreatePath = CreatePath | ErrorResponse
+union UUpdatedStatusPath = UpdateStatusPath | ErrorResponse
 
 ## Queries
 type Query {
-	getAllPaths: UGetAllPaths @auth
-	getPathsByOwner(owner: String): UGetAllPaths @auth
+	getAllPaths(lastPath: String): UGetAllPaths @auth
+	getPathsByOwner(lastPath: String, owner: String): UGetPathsOwner @auth
 	getPathById(id: String!): UGetPath @auth
 }
 
 ## Mutations
 type Mutation {
-	createPath(path: InputPath!): UCreatePath @auth
+	createPath(
+		path: InputPath!
+		access: PathAccess!
+		status: PathStatus!
+	): UCreatePath @auth
+	updateStatusPath(path: String!, status: PathStatus!): UUpdatedStatusPath @auth
 }

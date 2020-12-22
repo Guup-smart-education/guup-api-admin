@@ -20,7 +20,7 @@ import { sendGuupEmail } from './../../utils/smtp-utils'
 import { ErrorGenerator, EErrorCode } from './../../utils/error-utils'
 import { FirebaseError } from 'firebase-admin'
 import accessTokenTemplate from './../../templates/accessToken'
-import { User } from './../../entities/user'
+import { User, Profile } from './../../entities/user'
 import { random } from '../../helper'
 
 enum TypesSignInUsers {
@@ -31,6 +31,7 @@ enum TypesSignInUsers {
 export const serviceRequestAccess = async ({
 	email,
 }: InputRequestAccess): Promise<RequestAccessResponse> => {
+	console.log('serviceRequestAccess')
 	const companyRef = db.collection(collections.company)
 	const verificationRef = db.collection(collections.verification)
 	// Remove old tokens
@@ -41,16 +42,14 @@ export const serviceRequestAccess = async ({
 		await verificationRef.doc(id).delete()
 	}
 	// Share client by domain
-	const client = await companyRef
-		.where('domain', '==', R.last(R.split('@', email)))
-		.get()
+	const userDomain = R.last(R.split('@', email))
+	const client = await companyRef.where('domain', '==', userDomain).get()
 	if (!client.size) {
 		return {
 			__typename: 'ErrorResponse',
 			error: {
 				type: EErrorCode.NOT_FOUND,
-				message:
-					'Não existe uma empresa asociada com teu email, se vc quer cadastrar a sua empresa, entre em contato com a gente :)',
+				message: `Não cocheço a empresa ${userDomain}, verifica se todo esta correto 😅`,
 			},
 		}
 	}
@@ -153,12 +152,11 @@ export const serviceAuthSignin = async ({
 	// Building user data and token session
 	let user: User = {}
 	verifyUser.forEach((data) => {
-		const { email, profile, phoneNumber }: User = data.data()
+		const { profile, role }: User = data.data()
 		user = {
 			uid: data.id,
-			email,
 			profile,
-			phoneNumber,
+			role,
 		}
 	})
 	const { token, refreshToken } = jwtGenerateToken({
@@ -207,9 +205,21 @@ export const serviceAuthSignup = async ({
 		}
 	}
 	// Inserting new user
-	await userRef.add(user)
+	const completeUser: User = {
+		email: user.email,
+		phoneNumber: user.phoneNumber,
+		role: user.role,
+		profile: {
+			displayName: user.displayName,
+		},
+	}
+	const newUserId = await userRef.add(completeUser)
+	const newUser: User = {
+		...completeUser,
+		uid: newUserId.id,
+	}
 	const { token, refreshToken } = jwtGenerateToken({
-		user,
+		user: newUser,
 		roles: user.role || '',
 	})
 	return {
@@ -218,7 +228,7 @@ export const serviceAuthSignup = async ({
 			token,
 			refreshToken,
 		},
-		user,
+		user: { ...completeUser },
 		success: {
 			message: 'User created successfull',
 		},

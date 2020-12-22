@@ -1,27 +1,69 @@
+// import './../../config/enviroment'
+import R from 'ramda'
 import {
 	// Gets
 	GetCoursesByUserResponse,
 	GetCoursesResponse,
 	GetCourseById,
+	GetCoursesByPath,
 	// Posts
 	PostCourseResponse,
 	PostUpdateCourseResponse,
+	UpdatePathCourses,
+	RemoveCourseResponse,
+	GetCoursesByOwner,
 } from './courses'
 import { Courses } from './../../entities/courses'
+import { MediaMetaData } from './../../entities/mediaData'
+import { Profile } from './../../entities/user'
+import { Path } from './../../entities/path'
+import { MuxAsset } from './../../entities/mux'
+import { TypesErrors, EMediaState } from './../../data/enums'
 import { ErrorGenerator } from './../../utils/error-utils'
-import { db, collections } from './../../firebase/firebase'
-import { FirebaseError } from 'firebase-admin'
+import { db, collections, storage } from './../../firebase/firebase'
+import { FirebaseError, firestore } from 'firebase-admin'
+import { LIMIT_LIST } from '../../constants'
+import {
+	MuxCreateAsset,
+	MuxGetPlaybackID,
+	MuxGenerateThumbnail,
+	MuxGenerateGif,
+	MuxDeleteAsset,
+} from '../../service/mux-service'
+
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
 
 // Get
 
-export const serviceGetCourses = (): Promise<GetCoursesResponse> => {
+export const serviceGetCourses = async (
+	lastCourse: string
+): Promise<GetCoursesResponse> => {
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.medium)
+		: courseRef.orderBy('createdAt', 'desc').limit(LIMIT_LIST.medium)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
+		coursePageRef
 			.get()
 			.then((data) => {
 				let courses: Array<Courses> = []
 				data.forEach((doc) => {
-					const course = { id: doc.id, ...doc.data() }
+					const dataCourse: Courses = doc.data()
+					const course: Courses = {
+						id: doc.id,
+						...dataCourse,
+						createdAt: dataCourse.createdAt.toDate(),
+					}
 					courses.push(course)
 				})
 				resolve({
@@ -44,24 +86,37 @@ export const serviceGetCourses = (): Promise<GetCoursesResponse> => {
 	})
 }
 
-export const serviceGetCoursesByUser = (
-	uid: string
-): Promise<GetCoursesByUserResponse> => {
+export const serviceGetCoursesByUser = async (
+	uid: string,
+	lastCourse: string
+): Promise<GetCoursesByOwner> => {
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.where('owner', '==', uid)
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.medium)
+		: courseRef
+				.where('owner', '==', uid)
+				.orderBy('createdAt', 'desc')
+				.limit(LIMIT_LIST.medium)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
-			.where('owner', '==', uid)
+		coursePageRef
 			.get()
 			.then((data) => {
-				let courses: Array<Courses> = []
+				let coursesByOwner: Array<Courses> = []
 				data.forEach((doc) => {
 					const course = { id: doc.id, ...doc.data() }
-					courses.push(course)
-					console.log(doc.id, `Doc`, course)
+					coursesByOwner.push(course)
 				})
-				console.log(`All Courses by user`, courses)
 				resolve({
-					__typename: 'GetCourses',
-					courses,
+					__typename: 'GetCoursesByOwner',
+					coursesByOwner,
 					success: {
 						message: 'All courses by users',
 					},
@@ -79,22 +134,42 @@ export const serviceGetCoursesByUser = (
 	})
 }
 
-export const serviceGetCoursesByPath = (
-	path: string
-): Promise<GetCoursesResponse> => {
+export const serviceGetCoursesByPath = async (
+	path: string,
+	lastCourse?: string
+): Promise<GetCoursesByPath> => {
+	const courseRef = db.collection(collections.courses)
+	let snapShot: any = null
+	if (lastCourse) {
+		snapShot = await courseRef.doc(lastCourse).get()
+	}
+	const coursePageRef = snapShot
+		? courseRef
+				.where('path', '==', path)
+				.orderBy('createdAt', 'desc')
+				.startAfter(snapShot)
+				.limit(LIMIT_LIST.tiny)
+		: courseRef
+				.where('path', '==', path)
+				.orderBy('createdAt', 'desc')
+				.limit(LIMIT_LIST.tiny)
 	return new Promise((resolve, reject) => {
-		db.collection(collections.courses)
-			.where('path', '==', path)
+		coursePageRef
 			.get()
 			.then((data) => {
-				let courses: Array<Courses> = []
+				let coursesByPath: Array<Courses> = []
 				data.forEach((doc) => {
-					const course = { id: doc.id, ...doc.data() }
-					courses.push(course)
+					const data: Courses = doc.data()
+					const course = {
+						id: doc.id,
+						...data,
+						createdAt: data.createdAt && data.createdAt.toDate(),
+					}
+					coursesByPath.push(course)
 				})
 				resolve({
-					__typename: 'GetCourses',
-					courses,
+					__typename: 'GetCoursesByPath',
+					coursesByPath,
 					success: {
 						message: 'All courses by users',
 					},
@@ -149,6 +224,75 @@ export const serviceGetCourseDetailByUser = (
 
 // Post
 
+export const serviceRemoveCourse = async (
+	course: string
+): Promise<RemoveCourseResponse> => {
+	const courseRef = db.collection(collections.courses).doc(course)
+	const data = await courseRef.get()
+	const courseToDelete: Courses | undefined = data.data()
+	if (!data || !courseToDelete) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.NOT_FOUND,
+				message: `Conteudo não encontrado com ID: ${course}`,
+			},
+		}
+	}
+	// Mux delete data
+	const muxDeleteResponse: any = await MuxDeleteAsset(
+		`${courseToDelete.videoAssetId}`
+	)
+	console.log('muxResponse: ', muxDeleteResponse)
+
+	// TODO: O ue fazer quando de um erro na hora de eliminar um video no MUX?
+	// if (muxResponse.error) {
+	// 	return {
+	// 		__typename: 'ErrorResponse',
+	// 		error: {
+	// 			type: TypesErrors.ERROR,
+	// 			message: `Aconteceu um erro eliminado o mux asset: ${asseetId}`,
+	// 		},
+	// 	}
+	// }
+	// End mux delete data
+	// Firebase update (Remove media from firestorage)
+	if (courseToDelete.videoMetadata && courseToDelete.coverMetadata) {
+		const { videoMetadata, coverMetadata } = courseToDelete
+		await storage
+			.bucket(videoMetadata.fileBucket)
+			.file(videoMetadata.fileFullPath)
+			.delete()
+		await storage
+			.bucket(coverMetadata.fileBucket)
+			.file(coverMetadata.fileFullPath)
+			.delete()
+	}
+	// End firebase update
+	return new Promise((resolve, reject) => {
+		courseRef
+			.delete()
+			.then(() => {
+				resolve({
+					__typename: 'RemoveCourse',
+					removeCourse: course,
+					success: {
+						message: 'Curso removido com sucesso',
+					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				reject(ErrorGenerator(code, message))
+			})
+	})
+}
+
 export const serviceUpdateCourse = (
 	course: Courses
 ): Promise<PostUpdateCourseResponse> => {
@@ -169,15 +313,40 @@ export const serviceUpdateCourse = (
 	})
 }
 
-export const serviceCreateCourse = (
-	course: Courses
+export const serviceCreateCourse = async (
+	course: Courses,
+	videoMetadata: MediaMetaData,
+	coverMetadata: MediaMetaData
 ): Promise<PostCourseResponse> => {
-	console.log('couserviceCreateCourse: Course', course)
+	if (!videoMetadata || !coverMetadata) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.ERROR,
+				message: 'Não foram proporcionadas informações insuficientes',
+			},
+		}
+	}
+	const [filePublic] = await storage
+		.bucket(videoMetadata.fileBucket)
+		.file(`${videoMetadata.fileFullPath}`)
+		.makePublic()
+	const videoURL: string = `${process.env.GCLOUD_STORAGE_ADDRESS}/${filePublic.bucket}/${filePublic.object}`
+	// Creating a Video Asset
+	const muxCreateAsset: MuxAsset = await MuxCreateAsset(videoURL, 'public')
+	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
 		db.collection(collections.courses)
-			.add({ ...course })
+			.add({
+				...course,
+				createdAt,
+				videoMetadata,
+				coverMetadata,
+				videoURL,
+				videoAssetId: muxCreateAsset.id,
+				state: EMediaState.preparing,
+			})
 			.then(({ id }) => {
-				console.info('Course data', id)
 				resolve({
 					__typename: 'CreateCourse',
 					createCourse: id,
@@ -195,9 +364,113 @@ export const serviceCreateCourse = (
 	})
 }
 
+export const serviceUpdateCourseMedia = async (
+	videoAssetId: string,
+	state: keyof typeof EMediaState
+): Promise<UpdatePathCourses> => {
+	const ref = db.collection(collections.courses)
+	const data = await ref.where('videoAssetId', '==', videoAssetId).get()
+	let course: Courses | undefined
+	await data.forEach((doc) => {
+		course = { id: doc.id, ...doc.data() }
+	})
+	console.log('**************')
+	console.log('serviceUpdateCourseMedia: course => ', course)
+	console.log('**************')
+	if (!course) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				message: `Não foi encontrado a referencia do video com id ${videoAssetId}`,
+			},
+		}
+	}
+	// Getting mux data
+	const muxPlayBackId: any = await MuxGetPlaybackID(videoAssetId)
+	const videoPlaybackID = `${muxPlayBackId.id}`
+	const thumbnailURL = MuxGenerateThumbnail(videoPlaybackID)
+	const gifURL = MuxGenerateGif(videoPlaybackID)
+	// Updating course
+	return new Promise(async (resolve, reject) => {
+		ref
+			.doc(`${course?.id}`)
+			.update({
+				videoPlaybackID,
+				thumbnailURL,
+				gifURL,
+				state,
+			})
+			.then(() => {
+				resolve({
+					__typename: 'UpdateCourse',
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+	})
+}
+
+export const serviceUpdatePathOwners = async (
+	pathId: string,
+	owner: Profile
+): Promise<UpdatePathCourses> => {
+	const pathRef = db.collection(collections.paths).doc(pathId)
+	const data = await pathRef.get()
+	const path: Path | undefined = data ? data.data() : {}
+	if (!path) {
+		return {
+			__typename: 'ErrorResponse',
+			error: {
+				type: TypesErrors.NOT_FOUND,
+				message: 'Coleccion of course its not founded',
+			},
+		}
+	}
+	const owners = R.union(path.owners || [], [owner])
+	const contentCount = path.contentCount ? path.contentCount + 1 : 0
+	return new Promise((resolve, reject) => {
+		pathRef
+			.update({ owners, contentCount })
+			.then(() => {
+				resolve({
+					__typename: 'UpdatePathCourse',
+					success: {
+						message: 'Added participant to da collection',
+					},
+				})
+			})
+			.catch(({ code, message }: FirebaseError) => {
+				resolve({
+					__typename: 'ErrorResponse',
+					error: { ...ErrorGenerator(code, message) },
+				})
+			})
+	})
+}
+
 export const serviceGetCourseById = async (
 	course: string
 ): Promise<GetCourseById> => {
+	const ref = storage
+		.bucket('guup-36ad1.appspot.com')
+		.file(
+			'courses/49V0ly7JwjgcGk78WNEp/7c4b2b4c-b557-4a34-9609-6cedaf7638dd.mp4'
+		)
+	const [file] = await ref.makePublic()
+
+	// .getSignedUrl({
+	// 	action: 'read',
+	// 	expires: Date.now() + 1000 * 60 * 10,
+	// 	version: 'v4',
+	// })
+	// .then((res) => {
+	// 	console.log('makePublic: ', res)
+	// })
+	// .catch((e) => console.log('makePublic error: ', e))
 	return new Promise((resolve, reject) => {
 		db.collection(collections.courses)
 			.doc(course)

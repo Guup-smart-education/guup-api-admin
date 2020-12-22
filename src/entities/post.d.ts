@@ -1,17 +1,20 @@
 import { success } from './../models/success'
 import { Comment } from './comment'
 import { Profile } from './user'
-
+import { MediaMetaData } from './mediaData'
 export interface Post extends success {
-	id?: string
-	owner?: string
-	title?: string
-	description?: string
-	photoURL?: string
-	linkURL?: string
-	viewsCount?: Number
-	commentsCount?: Number
-	clapsCount?: Number
-	comments?: [Comment]
-	ownerProfile?: Profile
+	readonly id?: string
+	readonly owner?: string
+	readonly title?: string
+	readonly description?: string
+	readonly photoURL?: string
+	readonly linkURL?: string
+	readonly viewsCount?: number
+	readonly commentsCount?: number
+	readonly clapsCount?: number
+	readonly claps?: [string]
+	readonly comments?: [Comment]
+	readonly ownerProfile?: Profile
+	readonly createdAt?: any
+	readonly metadata?: MediaMetaData
 }

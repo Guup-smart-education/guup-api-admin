@@ -1,6 +1,12 @@
+## Enum
+enum ClapFor {
+	COURSE
+	POST
+}
+
 ## Inputs
 input InputPost {
-	title: String!
+	title: String
 	description: String!
 	photoURL: String
 	linkURL: String
@@ -12,29 +18,53 @@ type GetPosts {
 	success: Success
 }
 
+type GetPostsOwner {
+	allPostOwner: [Post]
+	success: Success
+}
+
 type GetPost {
 	post: Post
 	success: Success
 }
 
 type CreatePost {
-	createPost: String
+	createPost: Post
+	success: Success
+}
+
+type RemovePost {
+	post: String
+	success: Success
+}
+
+type ClapPost {
+	post: String
 	success: Success
 }
 
 ## Unions
 union UGetAllPost = GetPosts | ErrorResponse
+union UGetPostsByOwner = GetPostsOwner | ErrorResponse
 union UGetPost = GetPost | ErrorResponse
 union UCreatePost = CreatePost | ErrorResponse
+union URemovePost = RemovePost | ErrorResponse
+union UClapPost = ClapPost | ErrorResponse
 
 ## Queries
 type Query {
-	getAllPosts: UGetAllPost @auth
-	getPostsByOwner(owner: String): UGetAllPost @auth
+	getAllPosts(lastPost: String): UGetAllPost @auth
+	getPostsByOwner(lastPost: String, owner: String): UGetPostsByOwner @auth
 	getPostsById(id: String!): UGetPost @auth
 }
 
 ## Mutations
 type Mutation {
-	createPost(post: InputPost!): UCreatePost @auth
+	createPost(
+		post: InputPost!
+		metadata: IMetaData
+		ownerProfile: IProfile!
+	): UCreatePost @auth
+	removePost(post: String!): URemovePost @auth
+	clapPost(collection: ClapFor!, post: String!): UClapPost @auth
 }

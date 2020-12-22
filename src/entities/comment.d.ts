@@ -5,5 +5,6 @@ export interface Comment {
 	post?: string
 	owner?: string
 	description?: string
-	ownerProfile: Profile
+	ownerProfile?: Profile
+	createdAt?: any
 }

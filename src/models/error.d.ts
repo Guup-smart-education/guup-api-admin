@@ -1,6 +1,6 @@
 export interface error {
-  error?: {
-    type?: string
-    message?: string
-  }
+	error?: {
+		type?: string
+		message?: string
+	}
 }

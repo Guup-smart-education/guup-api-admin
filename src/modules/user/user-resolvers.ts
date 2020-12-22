@@ -1,4 +1,5 @@
 import { AuthData } from './../../models/auth'
+import { EUserTypesNames } from './user-enum'
 import { User } from './../../entities/user'
 import {
 	GetUserResponse,
@@ -18,6 +19,34 @@ import {
 } from './user-service'
 
 const userResolver = {
+	UGetUser: {
+		__resolveType: (obj: GetUserResponse, contex: any, info: any) => {
+			if (obj.user) return EUserTypesNames.GetUser
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UGetAllUsers: {
+		__resolveType: (obj: GetAllUsersResponse, contex: any, info: any) => {
+			if (obj.allUsers) return EUserTypesNames.GetAllUsers
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UUpdateProfile: {
+		__resolveType: (obj: UpdateProfileResponse, contex: any, info: any) => {
+			if (obj.updateprofile) return EUserTypesNames.UpdateProfile
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
+	UCreateUser: {
+		__resolveType: (obj: CreateUserResponse, contex: any, info: any) => {
+			if (obj.createuser) return EUserTypesNames.CreateUser
+			if (obj.error) return EUserTypesNames.ErrorResponse
+			return null
+		},
+	},
 	Query: {
 		getUser: async (
 			obj: any,
@@ -56,10 +85,20 @@ const userResolver = {
 		},
 		updateUserProfile: async (
 			obj: any,
-			{ user }: InputUser,
-			{ user: { uid = '' }, roles }: AuthData
+			{ user: inputUser }: InputUser,
+			{ user, roles }: AuthData
 		): Promise<UpdateProfileResponse> => {
-			const response = await serviceUpdateProfile(uid, user)
+			console.log('updateUserProfile: userAuth = ', user)
+			console.log('updateUserProfile: inputUser = ', inputUser)
+			if (!user) {
+				return {
+					__typename: 'ErrorResponse',
+					error: {
+						message: 'Não foi encontrado um usuario na sessão',
+					},
+				}
+			}
+			const response = await serviceUpdateProfile(`${user.uid}`, inputUser)
 			return response
 		},
 	},

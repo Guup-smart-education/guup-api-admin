@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv'
+import './config/enviroment'
 import express, { Application, Request, Response } from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import { getUserScope } from './utils/auth-utils'
@@ -6,16 +6,28 @@ import typeDefs from './graphql/types-defs'
 import resolvers from './graphql/resolvers'
 import { AuthDirective } from './directives/auth-directive'
 import { RolesDirective } from './directives/role-directive'
+import { MuxWebhooks } from './webhooks/muxHooks'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
 interface Context {
 	req: Request
 }
 
-dotenv.config()
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
+
+console.log('**********ENVIROMENT**********')
+console.log(`**********${process.env.ENV_NAME}**********`)
+console.log('**********ENVIROMENT**********')
+
+const schema = makeExecutableSchema({ typeDefs, resolvers })
 
 const server = new ApolloServer({
-	typeDefs,
-	resolvers,
+	// typeDefs,
+	// resolvers,
+	schema,
 	schemaDirectives: {
 		auth: AuthDirective,
 		hasRole: RolesDirective,
@@ -31,6 +43,8 @@ const server = new ApolloServer({
 const app: Application = express()
 
 const PORT = process.env.PORT || 8090
+
+app.use('/guup/api', MuxWebhooks)
 
 server.applyMiddleware({ app, path: '/graphql' })
 

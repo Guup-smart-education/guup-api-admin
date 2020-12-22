@@ -1,3 +1,8 @@
+## Enum
+enum TypesSignInUsers {
+	NEW_USERS
+	OLD_USERS
+}
 ## inputs
 input InputUser {
 	email: String!
@@ -15,18 +20,19 @@ type RequestAccess {
 
 type SigInSuccess {
 	access: JWT
-	user: UserProfile
+	user: User
 	success: Success
+}
+
+type SuccessAccess {
+	type: TypesSignInUsers
+	message: String
 }
 
 type SignUpSuccess {
 	access: JWT
-	user: UserProfile
+	user: User
 	success: Success
-}
-
-type MessageError {
-	error: Error
 }
 
 ## Union

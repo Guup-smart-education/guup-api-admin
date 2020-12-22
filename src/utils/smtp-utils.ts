@@ -1,10 +1,13 @@
-import * as dotenv from 'dotenv'
+// import './../config/enviroment'
 import nodemailer from 'nodemailer'
 
 // Smtp config
-const smtp = require('./../config/smtp.json')
+const smtp = require('./../../configs/smtp/smtp.json')
 
-dotenv.config()
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
 
 interface emailConfig {
 	to: string
