@@ -1,20 +1,29 @@
 {
 	"name": "guup-smart-education-api",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Guup smart education API",
 	"main": "index.js",
 	"scripts": {
 		"dev": "NODE_ENV=development ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
 		"quality": "NODE_ENV=test ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
 		"staging": "NODE_ENV=staging ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
 		"production": "NODE_ENV=production ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
+
+		"start": "NODE_ENV=production node ./dist/server.js",
+
 		"server:dev": "NODE_ENV=development ts-node dist/server.js",
 		"server:quality": "NODE_ENV=test ts-node dist/server.js",
 		"server:staging": "NODE_ENV=staging ts-node dist/server.js",
 		"server:production": "NODE_ENV=production ts-node dist/server.js",
-		"build": "rm -rf dist && NODE_ENV=test tsc && copyfiles -f src/**/**/*.gql src/**/*.gql dist/graphql/",
+
+		"build": "rm -rf dist && tsc -p . && copyfiles -f src/**/**/*.gql src/**/*.gql dist/graphql/",
+		"deploy": "gcloud app deploy",
+
+		"lint": "tslint -p .",
+		
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"show:prettie": "prettier --write .",
+
 		"install:clean": "rm -rf node_modules && yarn"
 	},
 	"keywords": [],

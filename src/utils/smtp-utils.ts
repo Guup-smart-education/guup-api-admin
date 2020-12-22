@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv-flow'
 import nodemailer from 'nodemailer'
 
 // Smtp config
-const smtp = require('./../config/smtp.json')
+const smtp = require('./../../configs/smtp/smtp.json')
 
 dotenv.config({
 	default_node_env: 'development',
