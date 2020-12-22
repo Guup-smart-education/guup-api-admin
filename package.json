@@ -2,28 +2,15 @@
 	"name": "guup-smart-education-api",
 	"version": "1.0.0",
 	"description": "Guup smart education API",
-	"main": "index.js",
+	"main": "server.js",
 	"scripts": {
 		"dev": "NODE_ENV=development ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
-		"quality": "NODE_ENV=test ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
-		"staging": "NODE_ENV=staging ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
-		"production": "NODE_ENV=production ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
-
-		"start": "NODE_ENV=production node ./dist/server.js",
-
-		"server:dev": "NODE_ENV=development ts-node dist/server.js",
-		"server:quality": "NODE_ENV=test ts-node dist/server.js",
-		"server:staging": "NODE_ENV=staging ts-node dist/server.js",
-		"server:production": "NODE_ENV=production ts-node dist/server.js",
-
+		"start": "NODE_ENV=development node ./dist/server.js",
 		"build": "rm -rf dist && tsc -p . && copyfiles -f src/**/**/*.gql src/**/*.gql dist/graphql/",
 		"deploy": "gcloud app deploy",
-
 		"lint": "tslint -p .",
-		
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"show:prettie": "prettier --write .",
-
 		"install:clean": "rm -rf node_modules && yarn"
 	},
 	"keywords": [],
@@ -31,7 +18,6 @@
 	"license": "ISC",
 	"dependencies": {
 		"@types/cors": "^2.8.6",
-		"@types/dotenv-flow": "^3.1.0",
 		"@types/graphql": "^14.5.0",
 		"@types/helmet": "^0.0.47",
 		"@types/jsonwebtoken": "^8.5.0",
@@ -42,7 +28,6 @@
 		"axios": "^0.21.0",
 		"cors": "^2.8.5",
 		"dotenv": "^8.2.0",
-		"dotenv-flow": "^3.2.0",
 		"express": "^4.17.1",
 		"express-jwt": "^6.0.0",
 		"firebase-admin": "^9.0.0",

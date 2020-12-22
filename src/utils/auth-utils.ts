@@ -1,11 +1,11 @@
-import * as dotenv from 'dotenv-flow'
+// import './../config/enviroment'
 import jwt, { JsonWebTokenError } from 'jsonwebtoken'
 import { AuthData } from './../models/auth'
 
-dotenv.config({
-	default_node_env: 'development',
-	silent: true,
-})
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
 
 enum JwtCenarios {
 	TokenAccessVerified = 'TOKEN_VERIFIED',

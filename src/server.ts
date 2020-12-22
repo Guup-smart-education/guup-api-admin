@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv-flow'
+import './config/enviroment'
 import express, { Application, Request, Response } from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import { getUserScope } from './utils/auth-utils'
@@ -13,10 +13,10 @@ interface Context {
 	req: Request
 }
 
-dotenv.config({
-	default_node_env: 'development',
-	silent: true,
-})
+// dotenv.config({
+// 	default_node_env: 'development',
+// 	silent: true,
+// })
 
 console.log('**********ENVIROMENT**********')
 console.log(`**********${process.env.ENV_NAME}**********`)
