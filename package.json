@@ -7,7 +7,6 @@
 		"dev": "NODE_ENV=development ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
 		"start": "NODE_ENV=development node ./dist/server.js",
 		"build": "rm -rf dist && tsc -p . && copyfiles -f src/**/**/*.gql src/**/*.gql dist/graphql/",
-		"deploy": "gcloud app deploy",
 		"lint": "tslint -p .",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"show:prettie": "prettier --write .",

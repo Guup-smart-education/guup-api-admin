@@ -1,2 +1,0 @@
-runtime: nodejs12 #NodeJS version for App engine
-service: default
