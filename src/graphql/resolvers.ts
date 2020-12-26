@@ -1,11 +1,5 @@
-// import './../config/enviroment'
 import path from 'path'
 import { mergeResolvers, loadFilesSync } from 'graphql-tools'
-
-// dotenv.config({
-// 	default_node_env: 'development',
-// 	silent: true,
-// })
 
 const ENV = process.env.ENV_NAME === 'development'
 

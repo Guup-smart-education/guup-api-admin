@@ -1,0 +1,9 @@
+# Docker ignore
+node_modules
+tmp
+dist
+
+.git
+*.md
+*.log
+!README.md
