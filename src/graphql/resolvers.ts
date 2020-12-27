@@ -7,10 +7,6 @@ const resolversArray = loadFilesSync(
 	path.join(process.cwd(), `./../**/*-resolvers.${ENV ? 'ts' : 'js'}`)
 )
 
-console.log('resolversArray: ', resolversArray.length)
-
 const resolvers = mergeResolvers(resolversArray)
-
-console.log('resolvers: ', resolvers)
 
 export default resolvers
