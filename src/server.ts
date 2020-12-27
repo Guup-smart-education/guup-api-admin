@@ -37,7 +37,7 @@ const server = new ApolloServer({
 
 const app: Application = express()
 
-const PORT = process.env.PORT || 8090
+const PORT = process.env.ENV_PORT || 8090
 
 app.use('/guup/api', MuxWebhooks)
 
