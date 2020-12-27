@@ -13,11 +13,6 @@ interface Context {
 	req: Request
 }
 
-// dotenv.config({
-// 	default_node_env: 'development',
-// 	silent: true,
-// })
-
 console.log('**********ENVIROMENT**********')
 console.log(`**********${process.env.ENV_NAME}**********`)
 console.log('**********ENVIROMENT**********')
@@ -25,8 +20,6 @@ console.log('**********ENVIROMENT**********')
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
 const server = new ApolloServer({
-	// typeDefs,
-	// resolvers,
 	schema,
 	schemaDirectives: {
 		auth: AuthDirective,
@@ -38,6 +31,8 @@ const server = new ApolloServer({
 		const scope = getUserScope(token)
 		return scope
 	},
+	playground: true,
+	introspection: true,
 })
 
 const app: Application = express()

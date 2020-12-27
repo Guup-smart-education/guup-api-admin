@@ -62,7 +62,7 @@ node_modules/
 .yarn-integrity
 
 # Dotenv environment variables file
-.env
+.env*
 
 # Remove dist build
 dist/
