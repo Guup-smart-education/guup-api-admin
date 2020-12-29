@@ -24,7 +24,6 @@
 		"express": "4.17.1",
 		"express-jwt": "6.0.0",
 		"firebase-admin": "9.0.0",
-		"firebase-functions": "3.9.1",
 		"graphql": "15.3.0",
 		"graphql-tools": "6.0.15",
 		"helmet": "3.23.3",
