@@ -15,11 +15,12 @@ import {
 	serviceAuthSignup,
 	serviceOnCreateAuth,
 } from './auth-service'
+import { o } from 'ramda'
 
 const userResolver = {
 	URequestAccess: {
 		__resolveType: (obj: RequestAccessResponse, contex: any, info: any) => {
-			if (obj.access || obj.expireIn || obj.user)
+			if (obj.access || obj.expireIn || obj.user || obj.success)
 				return ESiginTypesNames.RequestAccess
 			if (obj.error) return ESiginTypesNames.ErrorResponse
 			return null
@@ -27,14 +28,15 @@ const userResolver = {
 	},
 	USignInResult: {
 		__resolveType: (obj: SigninResponse, contex: any, info: any) => {
-			if (obj.user || obj.access) return ESiginTypesNames.SigInSuccess
+			if (obj.user || obj.access || obj.success)
+				return ESiginTypesNames.SigInSuccess
 			if (obj.error) return ESiginTypesNames.ErrorResponse
 			return null
 		},
 	},
 	USignUp: {
 		__resolveType: (obj: SignupResponse, contex: any, info: any) => {
-			if (obj.user) return ESiginTypesNames.SignUpSuccess
+			if (obj.user || obj.success) return ESiginTypesNames.SignUpSuccess
 			if (obj.error) return ESiginTypesNames.ErrorResponse
 			return null
 		},

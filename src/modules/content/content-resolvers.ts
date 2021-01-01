@@ -5,14 +5,15 @@ import { PostCreateContent, GetAllContents } from './content-service'
 const resolvers = {
 	UGetAllContents: {
 		__resolveType: (obj: GetAllContent, contex: any, info: any) => {
-			if (obj.allContents) return EContentTypesNames.GetContents
+			if (obj.allContents || obj.success) return EContentTypesNames.GetContents
 			if (obj.error) return EContentTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UCreateContent: {
 		__resolveType: (obj: PostContent, contex: any, info: any) => {
-			if (obj.contentCreated) return EContentTypesNames.CreateContent
+			if (obj.contentCreated || obj.success)
+				return EContentTypesNames.CreateContent
 			if (obj.error) return EContentTypesNames.ErrorResponse
 			return null
 		},

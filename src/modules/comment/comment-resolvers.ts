@@ -19,14 +19,14 @@ import { AuthData } from './../../models/auth'
 const reviewsResolvers = {
 	UGetComment: {
 		__resolveType: (obj: GetCommentList, contex: any, info: any) => {
-			if (obj.comments) return ECommentTypesNames.GetComment
+			if (obj.comments || obj.success) return ECommentTypesNames.GetComment
 			if (obj.error) return ECommentTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UPostComment: {
 		__resolveType: (obj: PostCreateComment, contex: any, info: any) => {
-			if (obj.comment) return ECommentTypesNames.PostComment
+			if (obj.comment || obj.success) return ECommentTypesNames.PostComment
 			if (obj.error) return ECommentTypesNames.ErrorResponse
 			return null
 		},

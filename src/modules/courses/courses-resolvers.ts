@@ -31,49 +31,51 @@ import { PostDeletePost } from '../post/post'
 const postResolvers = {
 	URemoveCourse: {
 		__resolveType: (obj: RemoveCourseResponse, contex: any, info: any) => {
-			if (obj.removeCourse) return CoursesTypesNames.RemoveCourse
+			if (obj.removeCourse || obj.success) return CoursesTypesNames.RemoveCourse
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UUpdateCourse: {
 		__resolveType: (obj: UptCourseResponse, contex: any, info: any) => {
-			if (obj.updateCourse) return CoursesTypesNames.UpdateCourse
+			if (obj.updateCourse || obj.success) return CoursesTypesNames.UpdateCourse
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UCreateCourse: {
 		__resolveType: (obj: PostCourseResponse, contex: any, info: any) => {
-			if (obj.createCourse) return CoursesTypesNames.CreateCourse
+			if (obj.createCourse || obj.success) return CoursesTypesNames.CreateCourse
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UGetCourses: {
 		__resolveType: (obj: GetCoursesResponse, contex: any, info: any) => {
-			if (obj.courses) return CoursesTypesNames.GetCourses
+			if (obj.courses || obj.success) return CoursesTypesNames.GetCourses
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UGetCoursesByPath: {
 		__resolveType: (obj: GetCoursesByPath, contex: any, info: any) => {
-			if (obj.coursesByPath) return CoursesTypesNames.GetCoursesByPath
+			if (obj.coursesByPath || obj.success)
+				return CoursesTypesNames.GetCoursesByPath
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UGetCoursesByOwner: {
 		__resolveType: (obj: GetCoursesByOwner, contex: any, info: any) => {
-			if (obj.coursesByOwner) return CoursesTypesNames.GetCoursesByOwner
+			if (obj.coursesByOwner || obj.success)
+				return CoursesTypesNames.GetCoursesByOwner
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UGetCourseDetail: {
 		__resolveType: (obj: GetCourseById, contex: any, info: any) => {
-			if (obj.course) return CoursesTypesNames.GetCourseDetail
+			if (obj.course || obj.success) return CoursesTypesNames.GetCourseDetail
 			if (obj.error) return CoursesTypesNames.ErrorResponse
 			return null
 		},
