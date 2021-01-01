@@ -21,28 +21,28 @@ import {
 const userResolver = {
 	UGetUser: {
 		__resolveType: (obj: GetUserResponse, contex: any, info: any) => {
-			if (obj.user) return EUserTypesNames.GetUser
+			if (obj.user || obj.success) return EUserTypesNames.GetUser
 			if (obj.error) return EUserTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UGetAllUsers: {
 		__resolveType: (obj: GetAllUsersResponse, contex: any, info: any) => {
-			if (obj.allUsers) return EUserTypesNames.GetAllUsers
+			if (obj.allUsers || obj.success) return EUserTypesNames.GetAllUsers
 			if (obj.error) return EUserTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UUpdateProfile: {
 		__resolveType: (obj: UpdateProfileResponse, contex: any, info: any) => {
-			if (obj.updateprofile) return EUserTypesNames.UpdateProfile
+			if (obj.updateprofile || obj.success) return EUserTypesNames.UpdateProfile
 			if (obj.error) return EUserTypesNames.ErrorResponse
 			return null
 		},
 	},
 	UCreateUser: {
 		__resolveType: (obj: CreateUserResponse, contex: any, info: any) => {
-			if (obj.createuser) return EUserTypesNames.CreateUser
+			if (obj.createuser || obj.success) return EUserTypesNames.CreateUser
 			if (obj.error) return EUserTypesNames.ErrorResponse
 			return null
 		},
