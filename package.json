@@ -11,7 +11,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"show:prettie": "prettier --write .",
 		"install:dev": "rm -rf node_modules && yarn",
-		"install:prod": "rm -rf node_modules && yarn"
+		"install:prod": "rm -rf node_modules && yarn",
+		"init:project": "./scripts/init-project.sh"
 	},
 	"keywords": [],
 	"author": "",
