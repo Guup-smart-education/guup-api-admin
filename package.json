@@ -12,7 +12,7 @@
 		"show:prettie": "prettier --write .",
 		"install:dev": "rm -rf node_modules && yarn",
 		"install:prod": "rm -rf node_modules && yarn",
-		"init:project": "./scripts/init-project.sh"
+		"set:git:hooks": "./scripts/git-hooks.sh"
 	},
 	"keywords": [],
 	"author": "",
