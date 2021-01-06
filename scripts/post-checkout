@@ -3,8 +3,10 @@
 echo "POST_CHECKOUT START"
 
 CURRENT_BRANCH=$(git branch --show-current)
+PREVIUS_BRANCH=$(git name-rev $(git rev-parse @{-1}) --name-only)
 
 echo "CURRENT_BRANCH: $CURRENT_BRANCH"
+echo "PREVIUS_BRANCH: $PREVIUS_BRANCH"
 
 ENV_CURRENT_FILE=.env.${CURRENT_BRANCH}
 
