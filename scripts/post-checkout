@@ -6,7 +6,9 @@ CURRENT_BRANCH=$(git branch --show-current)
 
 echo "CURRENT_BRANCH: $CURRENT_BRANCH"
 
-FILE=.env.${CURRENT_BRANCH}
-if test -f "$FILE"; then
-    echo "$FILE exits."
+ENV_CURRENT_FILE=.env.${CURRENT_BRANCH}
+
+if test -f "$ENV_CURRENT_FILE"; then
+    echo "$ENV_CURRENT_FILE exits."
+    mv ./${ENV_CURRENT_FILE} ./.env
 fi
