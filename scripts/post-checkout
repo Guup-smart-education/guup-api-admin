@@ -1,20 +1,12 @@
 #!/bin/bash
-NOCOLOR="\e[0m"
-REDCOLOR="\e[37;41m"
 
 echo "POST_CHECKOUT START"
 
-PREV_COMMIT=$1
-POST_COMMIT=$2
 CURRENT_BRANCH=$(git branch --show-current)
 
-echo "PREV_COMMIT: $PREV_COMMIT"
-echo "POST_COMMIT: $POST_COMMIT"
 echo "CURRENT_BRANCH: $CURRENT_BRANCH"
 
-if [[ -f composer.lock ]]; then
-    DIFF=`git diff --shortstat $PREV_COMMIT..$POST_COMMIT composer.lock`
-    if [[ $DIFF != "" ]]; then
-        echo -e "$REDCOLOR composer.lock has changed. You must run composer install$NOCOLOR"
-    fi
+FILE=.env.${CURRENT_BRANCH}
+if test -f "$FILE"; then
+    echo "$FILE exits."
 fi
