@@ -2,15 +2,26 @@
 
 echo "POST_CHECKOUT START"
 
-CURRENT_BRANCH=$(git branch --show-current)
 PREVIUS_BRANCH=$(git name-rev $(git rev-parse @{-1}) --name-only)
+CURRENT_BRANCH=$(git branch --show-current)
 
-echo "CURRENT_BRANCH: $CURRENT_BRANCH"
 echo "PREVIUS_BRANCH: $PREVIUS_BRANCH"
+echo "CURRENT_BRANCH: $CURRENT_BRANCH"
 
-ENV_CURRENT_FILE=.env.${CURRENT_BRANCH}
+ENV_PREV_FILE=.env.${PREVIUS_BRANCH}
+ENV_NEXT_FILE=.env.${CURRENT_BRANCH}
 
-if test -f "$ENV_CURRENT_FILE"; then
+
+if test -f ".env"; then
     echo "$ENV_CURRENT_FILE exits."
-    mv ./${ENV_CURRENT_FILE} ./.env
+    echo "Starting renaming .env to .env.$PREVIUS_BRANCH"
+    cp ./.env ./${ENV_PREV_FILE}
+    echo "End renaming .env to .env.$PREVIUS_BRANCH"
+fi
+
+if test -f "$ENV_NEXT_FILE"; then
+    echo "$ENV_NEXT_FILE exits."
+    echo "Starting renaming to .env.$CURRENT_BRANCH"
+    cp ./${ENV_NEXT_FILE} ./.env
+    echo "End renaming .env to .env.$CURRENT_BRANCH"
 fi
