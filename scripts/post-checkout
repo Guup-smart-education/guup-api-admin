@@ -1,11 +1,13 @@
 #!/bin/bash
 
-echo 'post-checkout hook' 
+echo "post-checkout hook"
 
 PREV_COMMIT=$1
 POST_COMMIT=$2
 BRANCH_CHECKOUT=$3
 
+echo "PREV_COMMIT: $PREV_COMMIT"
+echo "POST_COMMIT: $POST_COMMIT"
 echo "BRANCH_CHECKOUT: $BRANCH_CHECKOUT"
 
 NOCOLOR='\e[0m'
