@@ -5,12 +5,10 @@ echo "POST_CHECKOUT START"
 PREVIUS_BRANCH=$(git name-rev $(git rev-parse @{-1}) --name-only)
 CURRENT_BRANCH=$(git branch --show-current)
 
-echo "PREVIUS_BRANCH: $PREVIUS_BRANCH"
-echo "CURRENT_BRANCH: $CURRENT_BRANCH"
+echo "Checkout from $PREVIUS_BRANCH to $CURRENT_BRANCH"
 
 ENV_PREV_FILE=.env.${PREVIUS_BRANCH}
 ENV_NEXT_FILE=.env.${CURRENT_BRANCH}
-
 
 if test -f ".env"; then
     echo ".env exits."
