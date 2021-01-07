@@ -10,6 +10,8 @@ echo "Checkout from $PREVIUS_BRANCH to $CURRENT_BRANCH"
 ENV_PREV_FILE=.env.${PREVIUS_BRANCH}
 ENV_NEXT_FILE=.env.${CURRENT_BRANCH}
 
+echo "Files ==> prev env: $ENV_PREV_FILE - current env: $ENV_NEXT_FILE"
+
 if test -f ".env"; then
     echo ".env exits."
     echo "START renaming .env to .env.$PREVIUS_BRANCH"
