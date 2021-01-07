@@ -14,14 +14,14 @@ ENV_NEXT_FILE=.env.${CURRENT_BRANCH}
 
 if test -f ".env"; then
     echo ".env exits."
-    echo "Starting renaming .env to .env.$PREVIUS_BRANCH"
-    cp ./.env ./${ENV_PREV_FILE}
-    echo "End renaming .env to .env.$PREVIUS_BRANCH"
+    echo "START renaming .env to .env.$PREVIUS_BRANCH"
+    mv ./.env ./${ENV_PREV_FILE}
+    echo "END renaming .env to .env.$PREVIUS_BRANCH"
 fi
 
 if test -f "$ENV_NEXT_FILE"; then
     echo "$ENV_NEXT_FILE exits."
-    echo "Starting renaming .env to .env.$CURRENT_BRANCH"
-    cp ./${ENV_NEXT_FILE} ./.env
-    echo "End renaming .env to .env.$CURRENT_BRANCH"
+    echo "START renaming .env.$CURRENT_BRANCH to .env"
+    mv ./${ENV_NEXT_FILE} ./.env
+    echo "END renaming .env.$CURRENT_BRANCH to .env"
 fi
