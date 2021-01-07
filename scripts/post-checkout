@@ -2,26 +2,30 @@
 
 echo "POST_CHECKOUT START"
 
-PREVIUS_BRANCH=$(git name-rev $(git rev-parse @{-1}) --name-only)
-CURRENT_BRANCH=$(git branch --show-current)
+FULL_PREV_BRANCH="$(git rev-parse --symbolic-full-name @{-1})"
 
-echo "Checkout from $PREVIUS_BRANCH to $CURRENT_BRANCH"
+PREV_BRANCH=$(echo "$FULL_PREV_BRANCH" | cut -d'/' -f 3)
+NEXT_BRANCH=$(git branch --show-current)
 
-ENV_PREV_FILE=.env.${PREVIUS_BRANCH}
-ENV_NEXT_FILE=.env.${CURRENT_BRANCH}
+echo "PREV_BRANCH: $PREV_BRANCH"
+
+echo "Checkout from $PREV_BRANCH to $NEXT_BRANCH"
+
+ENV_PREV_FILE=.env.${PREV_BRANCH}
+ENV_NEXT_FILE=.env.${NEXT_BRANCH}
 
 echo "Files ==> prev env: $ENV_PREV_FILE - current env: $ENV_NEXT_FILE"
 
 if test -f ".env"; then
     echo ".env exits."
-    echo "START renaming .env to .env.$PREVIUS_BRANCH"
+    echo "START renaming .env to .env.$PREV_BRANCH"
     mv ./.env ./${ENV_PREV_FILE}
-    echo "END renaming .env to .env.$PREVIUS_BRANCH"
+    echo "END renaming .env to .env.$PREV_BRANCH"
 fi
 
 if test -f "$ENV_NEXT_FILE"; then
     echo "$ENV_NEXT_FILE exits."
-    echo "START renaming .env.$CURRENT_BRANCH to .env"
+    echo "START renaming .env.$NEXT_BRANCH to .env"
     mv ./${ENV_NEXT_FILE} ./.env
-    echo "END renaming .env.$CURRENT_BRANCH to .env"
+    echo "END renaming .env.$NEXT_BRANCH to .env"
 fi
