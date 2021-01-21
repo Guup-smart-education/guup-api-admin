@@ -95,8 +95,12 @@ const resolvers = {
 		createPost: async (
 			obj: any,
 			{ post, ownerProfile, metadata }: ICreatePost,
-			{ user: { uid, profile } }: AuthData
+			context: AuthData
 		): Promise<PostCreatePost> => {
+			const {
+				user: { uid, profile },
+			} = context
+			console.log('AuthData: context => ', context)
 			return await serviceCreatepost({
 				post: {
 					...post,

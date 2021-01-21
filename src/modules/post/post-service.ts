@@ -155,11 +155,11 @@ export const serviceGetPostsByID = ({ id }: IGetPostID): Promise<GetPost> => {
 
 // Posts
 
-export const serviceCreatepost = ({
-	post,
-	ownerProfile,
-	metadata,
-}: ICreatePost): Promise<PostCreatePost> => {
+export const serviceCreatepost = (
+	props: ICreatePost
+): Promise<PostCreatePost> => {
+	console.log('serviceCreatepost: ', props)
+	const { post, ownerProfile, metadata } = props
 	const postRef = db.collection(collections.posts)
 	const createdAt = firestore.Timestamp.now()
 	return new Promise((resolve, reject) => {
