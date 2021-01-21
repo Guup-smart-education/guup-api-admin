@@ -20,6 +20,7 @@ RUN yarn build
 
 ## Remove src
 RUN rm -rf src/
+RUN rm -rf scripts/
 
 # Start the api server
 CMD ["yarn", "start"]
