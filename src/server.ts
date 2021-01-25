@@ -30,7 +30,6 @@ const server = new ApolloServer({
 		const token = context.req.headers.authorization || ''
 		const scope = getUserScope(token)
 		console.log('*********SCOPE*********')
-		console.log('context: ', context)
 		console.log('scope: ', scope)
 		console.log('*********SCOPE*********')
 		return scope
