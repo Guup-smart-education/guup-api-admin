@@ -22,6 +22,11 @@ enum JwtErrorMessages {
 export const getUserScope = (token: string): any => {
 	const cleanToken = token.replace(`${process.env.AUTH_PREFIX_HEADER} `, '')
 	const tokenDecode = jwt.decode(cleanToken)
+	console.log('**********getUserScope**********')
+	console.log('token: ', token)
+	console.log('cleanToken: ', cleanToken)
+	console.log('tokenDecode: ', tokenDecode)
+	console.log('**********getUserScope**********')
 	return tokenDecode || {}
 }
 
